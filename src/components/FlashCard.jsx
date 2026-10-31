@@ -19,8 +19,9 @@ export default function FlashCard({
     if (revealed) return
     primeAudio()
     setPicked(choice)
-    playResult(choice === answer)
-    onAnswered?.(choice === answer)
+    const correct = choice === answer
+    playResult(correct)
+    onAnswered?.({ correct, picked: choice })
   }
 
   return (

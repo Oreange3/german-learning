@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import FlashCard from '../components/FlashCard.jsx'
+import RoundReview from '../components/RoundReview.jsx'
 import { readingsFor } from '../data/readings.js'
 import { localDateKey, readDailyProgress, seededShuffle, writeDailyProgress } from '../lib/daily.js'
 import { primeAudio } from '../lib/sound.js'
@@ -8,12 +9,46 @@ function progressKey(level) {
   return `lesen-${level}`
 }
 
+function readResult(result) {
+  if (result && typeof result === 'object') {
+    return { correct: Boolean(result.correct), picked: result.picked || '' }
+  }
+  return { correct: Boolean(result), picked: '' }
+}
+
+function dealPractice(level) {
+  const pool = readingsFor(level)
+  const text = pool[Math.floor(Math.random() * pool.length)]
+  const question = text.questions[Math.floor(Math.random() * text.questions.length)]
+  return { text, question }
+}
+
+function nextPractice(level, current) {
+  const pool = readingsFor(level)
+  const same = current?.text
+  if (same) {
+    const index = same.questions.findIndex((item) => item.id === current.question.id)
+    if (index >= 0 && index < same.questions.length - 1) {
+      return { text: same, question: same.questions[index + 1] }
+    }
+  }
+  let text = pool[Math.floor(Math.random() * pool.length)]
+  let guard = 0
+  while (text.id === same?.id && pool.length > 1 && guard < 8) {
+    text = pool[Math.floor(Math.random() * pool.length)]
+    guard += 1
+  }
+  return { text, question: text.questions[0] }
+}
+
 export default function LesenGame() {
   const [level, setLevel] = useState('B1')
   const [mode, setMode] = useState('daily')
   const [holdId, setHoldId] = useState(null)
   const [practice, setPractice] = useState(null)
   const [session, setSession] = useState({ seen: 0, correct: 0 })
+  const [round, setRound] = useState([])
+  const [reviewOn, setReviewOn] = useState(false)
   const today = localDateKey()
   const key = progressKey(level)
   const [progress, setProgress] = useState(() => readDailyProgress(progressKey(level)))
@@ -21,6 +56,7 @@ export default function LesenGame() {
   useEffect(() => {
     setProgress(readDailyProgress(key))
     setHoldId(null)
+    setReviewOn(false)
   }, [key])
 
   const dailyText = useMemo(() => {
@@ -35,48 +71,64 @@ export default function LesenGame() {
   const dailyCorrect = progress.answers.filter(
     (item) => item.correct && dailyText.questions.some((question) => question.id === item.id),
   ).length
+  const dailyComplete = dailyText.questions.length > 0 && dailyDone === dailyText.questions.length
+
+  const dailySlides = useMemo(() => {
+    return progress.answers
+      .map((item) => {
+        const source = dailyText.questions.find((question) => question.id === item.id)
+        if (!source) return null
+        return {
+          id: item.id,
+          kicker: dailyText.title,
+          prompt: source.prompt,
+          picked: item.picked || (item.correct ? source.answer : '—'),
+          answer: source.answer,
+          correct: Boolean(item.correct),
+        }
+      })
+      .filter(Boolean)
+  }, [progress, dailyText])
 
   useEffect(() => {
     if (mode !== 'practice') return
-    const pool = readingsFor(level)
-    const text = pool[Math.floor(Math.random() * pool.length)]
-    const question = text.questions[Math.floor(Math.random() * text.questions.length)]
-    setPractice({ text, question })
+    setPractice(dealPractice(level))
     setSession({ seen: 0, correct: 0 })
+    setRound([])
+    setReviewOn(false)
   }, [mode, level])
-
-  function nextPractice(current) {
-    const pool = readingsFor(level)
-    const same = current?.text
-    if (same) {
-      const index = same.questions.findIndex((item) => item.id === current.question.id)
-      if (index >= 0 && index < same.questions.length - 1) {
-        return { text: same, question: same.questions[index + 1] }
-      }
-    }
-    let text = pool[Math.floor(Math.random() * pool.length)]
-    let guard = 0
-    while (text.id === same?.id && pool.length > 1 && guard < 8) {
-      text = pool[Math.floor(Math.random() * pool.length)]
-      guard += 1
-    }
-    return { text, question: text.questions[0] }
-  }
 
   const text = mode === 'daily' ? dailyText : practice?.text
   const question = mode === 'daily' ? dailyQuestion : practice?.question
   const todayLabel = new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+  const showReview = mode === 'daily' ? reviewOn || (dailyComplete && !holdId) : reviewOn
+  const slides = mode === 'daily' ? dailySlides : round
+  const unanswered = dailyText.questions.filter((item) => !answeredIds.has(item.id))
+  const onLastDaily = mode === 'daily' && Boolean(question) && unanswered.length === 0
 
-  function onAnswered(correct) {
+  function onAnswered(result) {
+    const { correct, picked } = readResult(result)
     if (mode === 'practice') {
+      if (!question || !text) return
       setSession((prev) => ({ seen: prev.seen + 1, correct: prev.correct + (correct ? 1 : 0) }))
+      setRound((prev) => [
+        ...prev,
+        {
+          id: `${question.id}-${prev.length}`,
+          kicker: text.title,
+          prompt: question.prompt,
+          picked,
+          answer: question.answer,
+          correct,
+        },
+      ])
       return
     }
     if (!question) return
     setHoldId(question.id)
     setProgress((prev) => {
       if (prev.answers.some((item) => item.id === question.id)) return prev
-      const next = { answers: [...prev.answers, { id: question.id, correct }] }
+      const next = { answers: [...prev.answers, { id: question.id, correct, picked }] }
       writeDailyProgress(key, next)
       return next
     })
@@ -85,10 +137,32 @@ export default function LesenGame() {
   function onNext() {
     primeAudio()
     if (mode === 'practice') {
-      setPractice(nextPractice(practice))
+      setPractice(nextPractice(level, practice))
       return
     }
+    const finished = dailyText.questions.every((item) => answeredIds.has(item.id) || item.id === question?.id)
     setHoldId(null)
+    if (finished) setReviewOn(true)
+  }
+
+  function startPractice() {
+    primeAudio()
+    if (mode === 'practice') {
+      setPractice(dealPractice(level))
+      setSession({ seen: 0, correct: 0 })
+      setRound([])
+      setReviewOn(false)
+      return
+    }
+    setMode('practice')
+  }
+
+  function newRound() {
+    primeAudio()
+    setPractice(dealPractice(level))
+    setSession({ seen: 0, correct: 0 })
+    setRound([])
+    setReviewOn(false)
   }
 
   return (
@@ -97,47 +171,87 @@ export default function LesenGame() {
       <p>Read the short text, then answer. These passages are original practice, written for this class.</p>
       <div className="mode-row" role="group" aria-label="Level">
         {['B1', 'B2'].map((item) => (
-          <button key={item} type="button" className={level === item ? 'btn btn-red' : 'btn'} aria-pressed={level === item} onClick={() => { primeAudio(); setLevel(item) }}>
+          <button
+            key={item}
+            type="button"
+            className={level === item ? 'btn btn-red' : 'btn'}
+            aria-pressed={level === item}
+            onClick={() => {
+              primeAudio()
+              setLevel(item)
+            }}
+          >
             {item}
           </button>
         ))}
       </div>
       <div className="mode-row" role="group" aria-label="Play mode">
-        <button type="button" className={mode === 'daily' ? 'btn btn-gold' : 'btn'} aria-pressed={mode === 'daily'} onClick={() => { primeAudio(); setMode('daily'); setHoldId(null) }}>
+        <button
+          type="button"
+          className={mode === 'daily' ? 'btn btn-gold' : 'btn'}
+          aria-pressed={mode === 'daily'}
+          onClick={() => {
+            primeAudio()
+            setMode('daily')
+            setHoldId(null)
+            setReviewOn(false)
+          }}
+        >
           Daily
         </button>
-        <button type="button" className={mode === 'practice' ? 'btn btn-gold' : 'btn'} aria-pressed={mode === 'practice'} onClick={() => { primeAudio(); setMode('practice') }}>
+        <button type="button" className={mode === 'practice' ? 'btn btn-gold' : 'btn'} aria-pressed={mode === 'practice'} onClick={startPractice}>
           Practice
         </button>
       </div>
       <p className="hint">
         {mode === 'daily'
           ? `Today (${todayLabel}), ${level}: ${dailyDone} / ${dailyText.questions.length} · ${dailyCorrect} correct.`
-          : `Practice: ${session.correct} correct out of ${session.seen}.`}
+          : `Practice: ${session.correct} correct out of ${session.seen}. End closes this round.`}
       </p>
-      {text ? (
-        <article className="passage">
-          <h3 lang="de">{text.title}</h3>
-          <p lang="de">{text.text}</p>
-        </article>
-      ) : null}
-      {mode === 'daily' && !question ? (
-        <p className="flash-result" role="status">
-          Today&apos;s {level} text is done. {dailyCorrect} of {dailyText.questions.length} correct. A different text waits tomorrow.
-        </p>
-      ) : null}
-      {question ? (
-        <FlashCard
-          key={`${mode}-${level}-${question.id}`}
-          kicker="Question"
-          prompt={question.prompt}
-          choices={question.choices}
-          answer={question.answer}
-          nextLabel={mode === 'daily' ? 'Next question' : 'Next'}
-          onAnswered={onAnswered}
-          onNext={onNext}
-        />
-      ) : null}
+      {showReview ? (
+        <>
+          {mode === 'daily' ? (
+            <p className="hint">
+              Today&apos;s {level} text is done. {dailyCorrect} of {dailyText.questions.length} correct.
+            </p>
+          ) : (
+            <p className="hint">This round: {round.filter((item) => item.correct).length} correct of {round.length}.</p>
+          )}
+          <RoundReview
+            key={slides.map((item) => item.id).join('|')}
+            slides={slides}
+            onNewRound={mode === 'practice' ? newRound : null}
+          />
+        </>
+      ) : (
+        <>
+          {text ? (
+            <article className="passage">
+              <h3 lang="de">{text.title}</h3>
+              <p lang="de">{text.text}</p>
+            </article>
+          ) : null}
+          {mode === 'practice' && round.length > 0 ? (
+            <p>
+              <button type="button" className="btn" onClick={() => setReviewOn(true)}>
+                End
+              </button>
+            </p>
+          ) : null}
+          {question ? (
+            <FlashCard
+              key={`${mode}-${level}-${question.id}`}
+              kicker="Question"
+              prompt={question.prompt}
+              choices={question.choices}
+              answer={question.answer}
+              nextLabel={mode === 'daily' ? (onLastDaily ? 'End' : 'Next question') : 'Next'}
+              onAnswered={onAnswered}
+              onNext={onNext}
+            />
+          ) : null}
+        </>
+      )}
     </section>
   )
 }

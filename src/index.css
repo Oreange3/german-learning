@@ -1323,6 +1323,29 @@ h3 .muted {
   border-color: var(--paper-ink);
 }
 
+.review-count {
+  margin: 0 0 8px;
+  color: #6f6456;
+  font-size: 14px;
+}
+
+.review-line {
+  margin: 0 auto 8px;
+  max-width: 520px;
+  text-align: left;
+}
+
+.review-nav {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.review-nav .btn {
+  margin: 0;
+  min-width: 48px;
+}
+
 @media (max-width: 1060px) {
   .site,
   .flag-bar {
