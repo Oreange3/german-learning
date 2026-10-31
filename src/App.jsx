@@ -3,6 +3,7 @@ import Layout from './components/Layout.jsx'
 import AdminOnly from './components/AdminOnly.jsx'
 import About from './pages/About.jsx'
 import GenderGame from './pages/GenderGame.jsx'
+import ClozeGame from './pages/ClozeGame.jsx'
 import LesenGame from './pages/LesenGame.jsx'
 import Login from './pages/Login.jsx'
 import Notes from './pages/Notes.jsx'
@@ -37,6 +38,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<GenderGame />} />
         <Route path="/lesen" element={<LesenGame />} />
+        <Route path="/luecken" element={<ClozeGame />} />
         <Route path="/pronouns" element={<PronounGame />} />
         <Route path="/login" element={<Login />} />
         <Route path="/notes" element={<Notes />} />

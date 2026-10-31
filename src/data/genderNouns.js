@@ -73,13 +73,61 @@ const CHOICES = {
   gen: ['des', 'der'],
 }
 
+const FRAMES = {
+  nom: {
+    sg: [{ left: 'Hier ist', en: 'Here is' }],
+    pl: [{ left: 'Hier sind', en: 'Here are' }],
+  },
+  akk: {
+    sg: [
+      { left: 'für', en: 'for' },
+      { left: 'ohne', en: 'without' },
+    ],
+    pl: [
+      { left: 'für', en: 'for' },
+      { left: 'ohne', en: 'without' },
+    ],
+  },
+  dat: {
+    sg: [
+      { left: 'von', en: 'from' },
+      { left: 'zu', en: 'to' },
+    ],
+    pl: [
+      { left: 'von', en: 'from' },
+      { left: 'zu', en: 'to' },
+    ],
+  },
+  gen: {
+    sg: [
+      { left: 'wegen', en: 'because of' },
+      { left: 'trotz', en: 'despite' },
+    ],
+    pl: [
+      { left: 'wegen', en: 'because of' },
+      { left: 'trotz', en: 'despite' },
+    ],
+  },
+}
+
+function frameFor(noun, number, caseId) {
+  const options = FRAMES[caseId][number]
+  let hash = 0
+  const key = `${noun.id}-${number}`
+  for (let i = 0; i < key.length; i += 1) hash += key.charCodeAt(i)
+  return options[hash % options.length]
+}
+
 export function makeGenderCard(noun, number, caseId) {
   const key = number === 'pl' ? 'pl' : noun.gender
   const form = number === 'pl' ? (caseId === 'dat' ? noun.plDat : noun.plural) : caseId === 'gen' ? noun.genitive : noun.singular
+  const frame = frameFor(noun, number, caseId)
+  const thing = number === 'pl' ? noun.enPl : noun.en
   return {
     id: `${noun.id}-${number}`,
     form,
-    en: number === 'pl' ? noun.enPl : noun.en,
+    phrase: `${frame.left} ___ ${form}`,
+    en: `${frame.en} the ${thing}`,
     numberLabel: number === 'pl' ? 'plural' : 'singular',
     answer: ARTICLES[caseId][key],
     choices: CHOICES[caseId],

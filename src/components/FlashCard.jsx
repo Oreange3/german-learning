@@ -52,7 +52,18 @@ export default function FlashCard({
     <article className={`flash${tone}`}>
       {kicker ? <p className="flash-kicker">{kicker}</p> : null}
       <p className="flash-word" lang="de">
-        {prompt}
+        {String(prompt)
+          .split('___')
+          .map((bit, index, bits) => (
+            <span key={`${bit}-${index}`}>
+              {bit}
+              {index < bits.length - 1 ? (
+                <span className="article-gap" aria-label="article">
+                  ___
+                </span>
+              ) : null}
+            </span>
+          ))}
       </p>
       <div className="flash-choices" role="group" aria-label="Answers">
         {choices.map((choice) => {

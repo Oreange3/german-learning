@@ -39,6 +39,15 @@ export function seededShuffle(items, seedText) {
   return arr
 }
 
+/** One item per local day, in a fixed order, so a text returns only after the whole set has been used. */
+export function dailyPick(items, salt, date = new Date()) {
+  if (!items.length) return null
+  const order = seededShuffle(items, `${salt}|order`)
+  const [year, month, day] = localDateKey(date).split('-').map(Number)
+  const index = Math.floor(Date.UTC(year, month - 1, day) / 86400000)
+  return order[index % order.length]
+}
+
 const PROGRESS_KEY = 'goc_daily_progress'
 
 export function readDailyProgress(gameKey) {

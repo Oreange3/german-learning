@@ -70,7 +70,7 @@ export default function GenderGame() {
         return {
           id: item.id,
           kicker: `${caseLabel} · ${source.numberLabel}`,
-          prompt: source.form,
+          prompt: source.phrase,
           choices: source.choices,
           picked: item.skipped ? 'Unsure' : item.picked || (item.correct ? source.answer : '—'),
           answer: source.answer,
@@ -109,7 +109,7 @@ export default function GenderGame() {
         {
           id: `${card.id}-${prev.length}`,
           kicker: `${caseLabel} · ${card.numberLabel}`,
-          prompt: card.form,
+          prompt: card.phrase,
           choices: card.choices,
           picked: skipped ? 'Unsure' : picked,
           answer: card.answer,
@@ -165,8 +165,8 @@ export default function GenderGame() {
     <section className="panel">
       <h2>Daily gender</h2>
       <p>
-        A common noun is on the card. Choose its article for the case you picked. Plural uses die,
-        der, den, or der, depending on the case.
+        The gap is the article. The words around it show the case: Hier ist or Hier sind, für or ohne,
+        von (from the …) or zu (to the …), wegen or trotz.
       </p>
       <div className="mode-row" role="group" aria-label="Play mode">
         <button
@@ -232,7 +232,7 @@ export default function GenderGame() {
           <FlashCard
             key={`${mode}-${caseId}-${card.id}`}
             kicker={`${caseLabel} · ${card.numberLabel}`}
-            prompt={card.form}
+            prompt={card.phrase}
             translation={card.en}
             choices={card.choices}
             answer={card.answer}

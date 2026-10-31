@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import FlashCard from '../components/FlashCard.jsx'
 import RoundReview from '../components/RoundReview.jsx'
 import { readingsFor } from '../data/readings.js'
-import { localDateKey, readDailyProgress, seededShuffle, writeDailyProgress } from '../lib/daily.js'
+import { dailyPick, localDateKey, readDailyProgress, writeDailyProgress } from '../lib/daily.js'
 import { primeAudio } from '../lib/sound.js'
 
 function progressKey(level) {
@@ -64,10 +64,7 @@ export default function LesenGame() {
     setReviewOn(false)
   }, [key])
 
-  const dailyText = useMemo(() => {
-    const pool = readingsFor(level)
-    return seededShuffle(pool, `lesen|${level}|${today}`)[0]
-  }, [level, today])
+  const dailyText = useMemo(() => dailyPick(readingsFor(level), `lesen|${level}`), [level, today])
 
   const answeredIds = new Set(progress.answers.map((item) => item.id))
   const held = holdId ? dailyText.questions.find((item) => item.id === holdId) : null
@@ -185,7 +182,10 @@ export default function LesenGame() {
   return (
     <section className="panel">
       <h2>Lesen B1/B2</h2>
-      <p>Read the short text, then answer. These passages are original practice, written for this class.</p>
+      <p>
+        Read the text, then answer. Each day uses the next passage from a large set, so the same text does not come back
+        until the rest of that level has been used. These passages are original practice, written for this class.
+      </p>
       <div className="mode-row" role="group" aria-label="Level">
         {['B1', 'B2'].map((item) => (
           <button
