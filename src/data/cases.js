@@ -1,0 +1,546 @@
+const b = (...answer) => ({ answer: answer.length === 1 ? answer[0] : answer })
+
+export const caseCategory = {
+  id: 'cases',
+  title: 'Cases',
+  de: 'Kasus',
+  lessons: [
+    { id: 'cases-overview', title: 'The four cases' },
+    { id: 'cases-nominative', title: 'Nominative — who?' },
+    { id: 'cases-accusative', title: 'Accusative — whom?' },
+    { id: 'cases-dative', title: 'Dative — to whom?' },
+    { id: 'cases-genitive', title: 'Genitive — whose?' },
+    { id: 'cases-pronouns', title: 'He, she, it, they' },
+    { id: 'cases-possessives', title: 'His, her, their' },
+    { id: 'cases-demonstratives', title: 'This, that, those' },
+    { id: 'cases-genitive-verbs', title: 'Verbs with genitive' },
+    { id: 'cases-genitive-preps', title: 'Genitive prepositions' },
+    { id: 'cases-dessen', title: 'dessen & deren' },
+  ],
+}
+
+export const pronounDrill = {
+  caption: 'Fill: he / she / it / they / we / you',
+  help: 'Type the German form. Umlauts can be written ae/oe/ue. sie / Sie are both accepted as sie.',
+  headers: ['English', 'Nominative', 'Accusative', 'Dative', 'Genitive'],
+  rows: [
+    ['I', b('ich'), b('mich'), b('mir'), b('meiner')],
+    ['you (du)', b('du'), b('dich'), b('dir'), b('deiner')],
+    ['he', b('er'), b('ihn'), b('ihm'), b('seiner')],
+    ['she', b('sie'), b('sie'), b('ihr'), b('ihrer')],
+    ['it', b('es'), b('es'), b('ihm'), b('seiner')],
+    ['we', b('wir'), b('uns'), b('uns'), b('unser')],
+    ['you (ihr)', b('ihr'), b('euch'), b('euch'), b('euer')],
+    ['they', b('sie'), b('sie'), b('ihnen'), b('ihrer')],
+    ['you (formal)', b('Sie'), b('Sie'), b('Ihnen', 'ihnen'), b('Ihrer', 'ihrer')],
+  ],
+}
+
+export const possessiveSeinDrill = {
+  caption: 'Fill: his / its (sein) + Hund (der Hund)',
+  help: 'sein follows the noun it describes. Here the noun is masculine: der Hund.',
+  headers: ['Case', 'English', 'German'],
+  rows: [
+    ['Nominative', 'his dog (subject)', b('sein Hund')],
+    ['Accusative', 'his dog (object)', b('seinen Hund')],
+    ['Dative', 'to his dog', b('seinem Hund')],
+    ['Genitive', 'of his dog', b('seines Hundes')],
+  ],
+}
+
+export const possessiveIhrDrill = {
+  caption: 'Fill: her / their (ihr) + Tasche (die Tasche)',
+  help: 'ihr is her and also their. Feminine noun: die Tasche.',
+  headers: ['Case', 'English', 'German'],
+  rows: [
+    ['Nominative', 'her bag', b('ihre Tasche')],
+    ['Accusative', 'her bag (object)', b('ihre Tasche')],
+    ['Dative', 'to her bag', b('ihrer Tasche')],
+    ['Genitive', 'of her bag', b('ihrer Tasche')],
+  ],
+}
+
+export const thatDrill = {
+  caption: 'Fill: that / the (der-word) in four cases',
+  help: 'The pointing word der / die / das is the same shape as the article. This row is masculine: der Mann = that man / the man.',
+  headers: ['Case', 'masc. der', 'fem. die', 'neut. das', 'plural die'],
+  rows: [
+    ['Nominative', b('der'), b('die'), b('das'), b('die')],
+    ['Accusative', b('den'), b('die'), b('das'), b('die')],
+    ['Dative', b('dem'), b('der'), b('dem'), b('den')],
+    ['Genitive', b('des'), b('der'), b('des'), b('der')],
+  ],
+}
+
+export const caseLessons = {
+  'cases-overview': {
+    category: 'cases',
+    level: 'A1–A2',
+    title: 'The four cases',
+    teaser: 'German nouns and pronouns change shape by job in the sentence.',
+    wordIds: ['der', 'die', 'das', 'ich', 'er', 'sie'],
+    points: [
+      'A case is the job a noun or pronoun has: who does it, whom it hits, to whom it goes, whose it is.',
+      'Nominative answers wer? (who?). Accusative answers wen? (whom?). Dative answers wem? (to/for whom?). Genitive answers wessen? (whose?).',
+      'English mostly dropped this. German kept all four. Learn them as a set: articles, then pronouns, then possessives (his / her / their).',
+      'Spoken German often swaps genitive for von + dative (das Auto von dem Mann). Written German and exams still want the genitive.',
+    ],
+    examples: [
+      { de: 'Der Mann sieht den Hund.', en: 'The man (nom.) sees the dog (acc.).' },
+      { de: 'Er gibt ihr das Buch.', en: 'He (nom.) gives her (dat.) the book (acc.).' },
+      { de: 'Das ist das Auto des Mannes.', en: 'That is the man’s car (gen.).' },
+    ],
+    tables: [
+      {
+        caption: 'The four jobs',
+        headers: ['Case', 'Question', 'Job', 'der-word (masc.)'],
+        rows: [
+          ['Nominative', 'wer? who?', 'subject', 'der'],
+          ['Accusative', 'wen? whom?', 'direct object', 'den'],
+          ['Dative', 'wem? to whom?', 'indirect object', 'dem'],
+          ['Genitive', 'wessen? whose?', 'possessor', 'des'],
+        ],
+      },
+    ],
+  },
+  'cases-nominative': {
+    category: 'cases',
+    level: 'A1',
+    title: 'Nominative — who?',
+    teaser: 'The doer. The form after sein.',
+    wordIds: ['der', 'die', 'das', 'ein', 'ich', 'er', 'sie', 'es'],
+    points: [
+      'The subject of the sentence is nominative: Der Mann kocht. Die Frau liest. Das Kind spielt.',
+      'After sein, the complement stays nominative: Er ist ein Lehrer. Das ist die Frau.',
+      'Pronouns in nominative: ich, du, er, sie, es, wir, ihr, sie, Sie.',
+    ],
+    examples: [
+      { de: 'Er ist müde.', en: 'He is tired. — er = nominative.' },
+      { de: 'Sie sind Studenten.', en: 'They are students. — sie = nominative plural.' },
+      { de: 'Das ist mein Hund.', en: 'That is my dog. — das and mein Hund are both nominative.' },
+    ],
+    tables: [
+      {
+        caption: 'Articles in nominative',
+        headers: ['', 'masc.', 'fem.', 'neut.', 'plural'],
+        rows: [
+          ['the', 'der', 'die', 'das', 'die'],
+          ['a / an', 'ein', 'eine', 'ein', '—'],
+        ],
+      },
+    ],
+  },
+  'cases-accusative': {
+    category: 'cases',
+    level: 'A1',
+    title: 'Accusative — whom?',
+    teaser: 'The thing directly hit by the verb.',
+    wordIds: ['der', 'die', 'das', 'sehen', 'haben', 'kaufen'],
+    points: [
+      'Most everyday verbs take accusative: sehen, haben, kaufen, finden, brauchen, essen, trinken, lernen.',
+      'Only the masculine article changes: der → den, ein → einen. die and das stay the same.',
+      'Pronouns: ich → mich, du → dich, er → ihn. she/it/they stay sie / es / sie.',
+      'Some prepositions always take accusative: für, durch, ohne, um, gegen, bis.',
+    ],
+    examples: [
+      { de: 'Ich sehe ihn.', en: 'I see him. — ihn is accusative of er.' },
+      { de: 'Sie kauft einen Apfel.', en: 'She buys an apple. — einen because Apfel is masculine.' },
+      { de: 'Wir haben es.', en: 'We have it. — es does not change.' },
+    ],
+    tables: [
+      {
+        caption: 'Articles in accusative',
+        headers: ['', 'masc.', 'fem.', 'neut.', 'plural'],
+        rows: [
+          ['the', 'den', 'die', 'das', 'die'],
+          ['a / an', 'einen', 'eine', 'ein', '—'],
+        ],
+      },
+    ],
+  },
+  'cases-dative': {
+    category: 'cases',
+    level: 'A1–A2',
+    title: 'Dative — to whom?',
+    teaser: 'The receiver. Also the case after mit, zu, von, bei, aus, nach.',
+    wordIds: ['geben', 'helfen', 'mit', 'zu', 'von', 'bei'],
+    points: [
+      'Dative is the “to / for” slot: Er gibt der Frau das Buch. (gives the woman the book).',
+      'Articles: der → dem, die → der, das → dem, die (pl.) → den + noun often -n (den Kindern).',
+      'Pronouns: mir, dir, ihm, ihr, ihm, uns, euch, ihnen, Ihnen. Note: her (dat.) is ihr; him (dat.) is ihm; them is ihnen.',
+      'Classic dative verbs: helfen, danken, gehören, gefallen, glauben, folgen, antworten. Ich helfe ihm. Das Buch gehört ihr.',
+    ],
+    examples: [
+      { de: 'Ich gebe ihm den Schlüssel.', en: 'I give him the key. — ihm = to him.' },
+      { de: 'Das gefällt ihr.', en: 'She likes that. / That pleases her. — ihr = dative she.' },
+      { de: 'Wir fahren mit ihnen.', en: 'We are going with them. — mit always takes dative.' },
+    ],
+    tables: [
+      {
+        caption: 'Articles in dative',
+        headers: ['', 'masc.', 'fem.', 'neut.', 'plural'],
+        rows: [
+          ['the', 'dem', 'der', 'dem', 'den'],
+          ['a / an', 'einem', 'einer', 'einem', '—'],
+        ],
+      },
+      {
+        caption: 'Dative verbs (object is “to someone”)',
+        headers: ['Verb', 'Example', 'English'],
+        rows: [
+          ['helfen', 'Ich helfe dir.', 'I help you.'],
+          ['danken', 'Wir danken ihm.', 'We thank him.'],
+          ['gehören', 'Das gehört ihr.', 'That belongs to her.'],
+          ['gefallen', 'Der Film gefällt ihnen.', 'They like the film.'],
+          ['glauben', 'Glaubst du mir?', 'Do you believe me?'],
+        ],
+      },
+    ],
+  },
+  'cases-genitive': {
+    category: 'cases',
+    level: 'A2',
+    title: 'Genitive — whose?',
+    teaser: 'Possession. The case of his, her, its, their — and of “the man’s book.”',
+    wordIds: ['mann', 'frau', 'kind', 'haus', 'buch', 'name'],
+    points: [
+      'Ask wessen? (whose?). Das Buch des Mannes. Die Tasche der Frau. Das Zimmer des Kindes.',
+      'Articles: der/das → des + noun usually adds -s or -es (des Mannes, des Kindes). die (fem. or plural) → der (der Frau, der Kinder). No extra -s on feminine/plural nouns.',
+      'Names take -s with no article: Annas Hund. If the name already ends in s/ß/x/z, use an apostrophe: Max’ Buch.',
+      'In speech people say das Auto von dem Mann. Keep the genitive for writing, news, and this classroom.',
+      'Personal-pronoun genitive (seiner, ihrer) is rare by itself. Possession is usually done with sein / ihr in front of the noun: sein Hund, ihr Buch.',
+    ],
+    examples: [
+      { de: 'Das ist das Haus des Lehrers.', en: 'That is the teacher’s house.' },
+      { de: 'Die Farbe der Tasche ist rot.', en: 'The color of the bag is red.' },
+      { de: 'Wegen des Regens bleiben wir.', en: 'Because of the rain we stay. — wegen + genitive.' },
+    ],
+    tables: [
+      {
+        caption: 'Articles in genitive',
+        headers: ['', 'masc.', 'fem.', 'neut.', 'plural'],
+        rows: [
+          ['the', 'des (+s/es)', 'der', 'des (+s/es)', 'der'],
+          ['a / an', 'eines (+s/es)', 'einer', 'eines (+s/es)', '—'],
+        ],
+      },
+      {
+        caption: 'Nouns in genitive',
+        headers: ['Nominative', 'Genitive', 'English'],
+        rows: [
+          ['der Mann', 'des Mannes', 'of the man'],
+          ['die Frau', 'der Frau', 'of the woman'],
+          ['das Kind', 'des Kindes', 'of the child'],
+          ['die Kinder', 'der Kinder', 'of the children'],
+          ['der Hund', 'des Hundes', 'of the dog'],
+          ['das Haus', 'des Hauses', 'of the house'],
+        ],
+      },
+    ],
+    drills: [
+      {
+        caption: 'Fill the genitive article + noun',
+        help: 'One blank per row. Watch -s on masculine/neuter.',
+        headers: ['Nominative', 'Genitive'],
+        rows: [
+          ['der Mann', b('des Mannes')],
+          ['die Frau', b('der Frau')],
+          ['das Kind', b('des Kindes')],
+          ['die Leute', b('der Leute')],
+          ['der Tag', b('des Tages', 'des Tags')],
+        ],
+      },
+    ],
+  },
+  'cases-pronouns': {
+    category: 'cases',
+    level: 'A2',
+    title: 'He, she, it, they',
+    teaser: 'Personal pronouns in all four cases. This is the table to drill until it is boring.',
+    wordIds: ['ich', 'du', 'er', 'sie', 'es', 'wir', 'sie-formal'],
+    points: [
+      'English still has he / him / his. German has a full grid: nominative, accusative, dative, and a leftover genitive.',
+      'he: er → ihn → ihm → seiner. she: sie → sie → ihr → ihrer. it: es → es → ihm → seiner (same dative/genitive as he). they: sie → sie → ihnen → ihrer.',
+      'her as object of “to” is ihr (dative). her as “belonging to her” is ihr + noun (ihr Hund) or ihrer as a lone genitive pronoun.',
+      'them is ihnen in dative (mit ihnen) but sie in accusative (ich sehe sie).',
+      'Genitive pronouns (seiner, ihrer) show up after a few verbs: Wir gedenken seiner. In normal talk you will use sein / ihr instead.',
+    ],
+    examples: [
+      { de: 'Er sieht sie. Sie sieht ihn.', en: 'He sees her. She sees him.' },
+      { de: 'Ich gebe es ihm. Ich gebe es ihr.', en: 'I give it to him. I give it to her.' },
+      { de: 'Das Buch gehört ihnen.', en: 'The book belongs to them.' },
+      { de: 'Wir gedenken ihrer.', en: 'We commemorate them/her. — genitive pronoun, formal.' },
+    ],
+    tables: [
+      {
+        caption: 'Cheat sheet — personal pronouns',
+        headers: ['English', 'Nom.', 'Acc.', 'Dat.', 'Gen.'],
+        rows: [
+          ['I', 'ich', 'mich', 'mir', 'meiner'],
+          ['you (du)', 'du', 'dich', 'dir', 'deiner'],
+          ['he', 'er', 'ihn', 'ihm', 'seiner'],
+          ['she', 'sie', 'sie', 'ihr', 'ihrer'],
+          ['it', 'es', 'es', 'ihm', 'seiner'],
+          ['we', 'wir', 'uns', 'uns', 'unser'],
+          ['you (ihr)', 'ihr', 'euch', 'euch', 'euer'],
+          ['they', 'sie', 'sie', 'ihnen', 'ihrer'],
+          ['you (Sie)', 'Sie', 'Sie', 'Ihnen', 'Ihrer'],
+        ],
+      },
+    ],
+    drills: [pronounDrill],
+  },
+  'cases-possessives': {
+    category: 'cases',
+    level: 'A2',
+    title: 'His, her, their',
+    teaser: 'sein / ihr in front of a noun. This is how German usually says “his” and “her.”',
+    wordIds: ['er', 'sie', 'es', 'hund', 'tasche', 'kind', 'buch'],
+    points: [
+      'English “his / her / its / their” are possessives. German uses mein, dein, sein, ihr, unser, euer, ihr, Ihr in front of the thing owned.',
+      'sein = his or its (from er or es). ihr = her (from sie fem.) or their (from sie plural). Ihr (capital) = your, formal.',
+      'The possessive must also take case endings, like ein: sein Hund, seinen Hund, seinem Hund, seines Hundes.',
+      'Do not confuse ihr (dative “to her”) with ihr Hund (“her dog”). One is a personal pronoun; the other is a possessive article.',
+      'There is no extra word for “its” — use sein with a neuter owner: Das Kind und sein Buch.',
+    ],
+    examples: [
+      { de: 'Das ist sein Hund.', en: 'That is his dog. / That is its dog.' },
+      { de: 'Ich sehe ihren Bruder.', en: 'I see her brother. / I see their brother. — ihren = acc. masc.' },
+      { de: 'Wir helfen ihrem Vater.', en: 'We help her/their father. — ihrem = dative masc.' },
+      { de: 'Die Farbe seines Autos ist rot.', en: 'The color of his car is red. — seines = genitive neuter.' },
+    ],
+    tables: [
+      {
+        caption: 'Whose? — the stems',
+        headers: ['Owner', 'Stem', 'English'],
+        rows: [
+          ['ich', 'mein', 'my'],
+          ['du', 'dein', 'your'],
+          ['er / es', 'sein', 'his / its'],
+          ['sie (she)', 'ihr', 'her'],
+          ['wir', 'unser', 'our'],
+          ['ihr (you pl.)', 'euer', 'your'],
+          ['sie (they)', 'ihr', 'their'],
+          ['Sie', 'Ihr', 'your (formal)'],
+        ],
+      },
+      {
+        caption: 'sein (his / its) like ein',
+        headers: ['Case', 'masc. Hund', 'fem. Tasche', 'neut. Buch', 'plural Bücher'],
+        rows: [
+          ['Nominative', 'sein Hund', 'seine Tasche', 'sein Buch', 'seine Bücher'],
+          ['Accusative', 'seinen Hund', 'seine Tasche', 'sein Buch', 'seine Bücher'],
+          ['Dative', 'seinem Hund', 'seiner Tasche', 'seinem Buch', 'seinen Büchern'],
+          ['Genitive', 'seines Hundes', 'seiner Tasche', 'seines Buches', 'seiner Bücher'],
+        ],
+      },
+      {
+        caption: 'ihr (her / their) like ein',
+        headers: ['Case', 'masc. Hund', 'fem. Tasche', 'neut. Buch', 'plural Bücher'],
+        rows: [
+          ['Nominative', 'ihr Hund', 'ihre Tasche', 'ihr Buch', 'ihre Bücher'],
+          ['Accusative', 'ihren Hund', 'ihre Tasche', 'ihr Buch', 'ihre Bücher'],
+          ['Dative', 'ihrem Hund', 'ihrer Tasche', 'ihrem Buch', 'ihren Büchern'],
+          ['Genitive', 'ihres Hundes', 'ihrer Tasche', 'ihres Buches', 'ihrer Bücher'],
+        ],
+      },
+    ],
+    drills: [possessiveSeinDrill, possessiveIhrDrill],
+  },
+  'cases-demonstratives': {
+    category: 'cases',
+    level: 'A2',
+    title: 'This, that, those',
+    teaser: 'der / die / das can mean “that.” dieser = this. jener = that (over there).',
+    wordIds: ['der', 'die', 'das', 'mann', 'frau', 'kind'],
+    points: [
+      'English “that” is often just the German article used as a pointer: Der ist mein Bruder. Das ist gut. Die kenne ich.',
+      'dieser / diese / dieses = this (near). jener / jene / jenes = that (far, more formal). Everyday speech prefers der da / die da / das da.',
+      'They decline like der-words in all four cases. Genitive: dieses Mannes, dieser Frau, jenes Kindes.',
+      'das as a pointing word is neuter even when you talk about a person: Das ist meine Schwester. (not Die ist… at the start of the ID sentence).',
+    ],
+    examples: [
+      { de: 'Das ist sein Auto.', en: 'That is his car.' },
+      { de: 'Diesen Mann kenne ich.', en: 'I know that/this man. — diesen = acc. masc.' },
+      { de: 'Mit jener Frau habe ich gesprochen.', en: 'I spoke with that woman. — jener = dat. fem.' },
+      { de: 'Trotz dieses Wetters gehen wir.', en: 'Despite this weather we go. — dieses = gen. neut.' },
+    ],
+    tables: [
+      {
+        caption: 'dieser (this) — four cases',
+        headers: ['Case', 'masc.', 'fem.', 'neut.', 'plural'],
+        rows: [
+          ['Nominative', 'dieser', 'diese', 'dieses', 'diese'],
+          ['Accusative', 'diesen', 'diese', 'dieses', 'diese'],
+          ['Dative', 'diesem', 'dieser', 'diesem', 'diesen'],
+          ['Genitive', 'dieses', 'dieser', 'dieses', 'dieser'],
+        ],
+      },
+      {
+        caption: 'jener (that, farther) — four cases',
+        headers: ['Case', 'masc.', 'fem.', 'neut.', 'plural'],
+        rows: [
+          ['Nominative', 'jener', 'jene', 'jenes', 'jene'],
+          ['Accusative', 'jenen', 'jene', 'jenes', 'jene'],
+          ['Dative', 'jenem', 'jener', 'jenem', 'jenen'],
+          ['Genitive', 'jenes', 'jener', 'jenes', 'jener'],
+        ],
+      },
+    ],
+    drills: [thatDrill],
+  },
+  'cases-genitive-verbs': {
+    category: 'cases',
+    level: 'B1',
+    title: 'Verbs with genitive',
+    teaser: 'A short, formal list. The object is in the genitive: gedenken seiner, bedürfen der Hilfe.',
+    wordIds: ['helfen', 'sehen', 'glauben'],
+    points: [
+      'Most German verbs take accusative or dative. A small old club still wants genitive. You meet them in news, law, and ceremonies.',
+      'Pattern: verb + genitive object. Wir gedenken der Toten. Das bedarf einer Erklärung. Man beschuldigt ihn des Diebstahls. (beschuldigen takes a person in accusative and the charge in genitive.)',
+      'The genitive pronouns live here: gedenken meiner / deiner / seiner / ihrer. That is why seiner and ihrer sit in the pronoun table.',
+      'In everyday talk, swap many of these for a preposition: sich erinnern an + Akk, sich schämen für + Akk, brauchen instead of bedürfen.',
+    ],
+    examples: [
+      { de: 'Wir gedenken der Opfer.', en: 'We commemorate the victims. — der Opfer = genitive plural.' },
+      { de: 'Wir gedenken seiner.', en: 'We commemorate him. — seiner = genitive of er.' },
+      { de: 'Das bedarf keiner Erklärung.', en: 'That requires no explanation. — keiner = genitive fem. of kein.' },
+      { de: 'Sie beschuldigt ihn des Diebstahls.', en: 'She accuses him of theft. — ihn acc., des Diebstahls gen.' },
+      { de: 'Ich erinnere mich an den Namen.', en: 'I remember the name. — spoken alternative to genitive.' },
+    ],
+    tables: [
+      {
+        caption: 'Genitive verbs (learn the club)',
+        headers: ['Verb', 'English', 'Pattern', 'Example'],
+        rows: [
+          ['gedenken', 'commemorate', '+ Gen', 'Wir gedenken der Toten.'],
+          ['bedürfen', 'to require', '+ Gen', 'Es bedarf der Ruhe.'],
+          ['sich schämen', 'be ashamed of', '+ Gen (or für + Akk)', 'Sie schämt sich ihrer Lüge.'],
+          ['sich erinnern', 'remember', '+ Gen (or an + Akk)', 'Ich erinnere mich des Tages.'],
+          ['beschuldigen', 'accuse of', '+ Akk + Gen', 'Man beschuldigt ihn des Betrugs.'],
+          ['anklagen', 'charge with', '+ Akk + Gen', 'Man klagt sie des Mordes an.'],
+          ['verdächtigen', 'suspect of', '+ Akk + Gen', 'Die Polizei verdächtigt ihn des Diebstahls.'],
+          ['sich annehmen', 'look after', '+ Gen', 'Sie nimmt sich der Kinder an.'],
+          ['sich bedienen', 'make use of', '+ Gen', 'Bitte bedienen Sie sich der Formulare.'],
+          ['sich enthalten', 'abstain from', '+ Gen', 'Er enthält sich der Stimme.'],
+        ],
+      },
+      {
+        caption: 'Same idea, everyday German',
+        headers: ['Genitive style', 'Normal style'],
+        rows: [
+          ['Wir gedenken der Toten.', 'Wir erinnern uns an die Toten.'],
+          ['Ich erinnere mich des Namens.', 'Ich erinnere mich an den Namen.'],
+          ['Sie schämt sich ihrer Worte.', 'Sie schämt sich für ihre Worte.'],
+          ['Das bedarf einer Pause.', 'Wir brauchen eine Pause.'],
+        ],
+      },
+    ],
+    drills: [
+      {
+        caption: 'Pick the genitive object',
+        help: 'Fill the missing genitive form. seiner / ihrer / des / der…',
+        headers: ['Cue', 'Write the missing bit'],
+        rows: [
+          ['Wir gedenken ___ (him).', b('seiner')],
+          ['Wir gedenken ___ (her).', b('ihrer')],
+          ['Wir gedenken ___ (them).', b('ihrer')],
+          ['Es bedarf ___ Hilfe. (the / fem.)', b('der')],
+          ['Man beschuldigt ihn ___ Diebstahls.', b('des')],
+        ],
+      },
+    ],
+  },
+  'cases-genitive-preps': {
+    category: 'cases',
+    level: 'A2–B1',
+    title: 'Genitive prepositions',
+    teaser: 'wegen, während, trotz, (an)statt — the set that still wants genitive.',
+    wordIds: ['regen', 'wetter', 'film', 'arbeit'],
+    points: [
+      'A handful of prepositions take genitive: wegen (because of), während (during), trotz (despite), (an)statt (instead of), außerhalb / innerhalb (outside / inside of), aufgrund (due to).',
+      'wegen des Regens, während des Films, trotz der Kälte, statt des Autos.',
+      'Casual speech uses dative: wegen dem Regen. Exams and this site want genitive: wegen des Regens.',
+      'wegen meiner / wegen seiner also exist (because of me / him) — that is the genitive pronoun again.',
+    ],
+    examples: [
+      { de: 'Wegen des Staus kommen wir spät.', en: 'Because of the traffic jam we arrive late.' },
+      { de: 'Während des Films war es still.', en: 'During the film it was quiet.' },
+      { de: 'Trotz des Wetters gehen wir raus.', en: 'Despite the weather we go out.' },
+      { de: 'Statt des Busses nehmen wir den Zug.', en: 'Instead of the bus we take the train.' },
+    ],
+    tables: [
+      {
+        caption: 'Genitive prepositions',
+        headers: ['Preposition', 'English', 'Example'],
+        rows: [
+          ['wegen', 'because of', 'wegen des Regens'],
+          ['während', 'during', 'während der Pause'],
+          ['trotz', 'despite', 'trotz der Kälte'],
+          ['(an)statt', 'instead of', 'statt des Autos'],
+          ['innerhalb', 'inside of', 'innerhalb der Stadt'],
+          ['außerhalb', 'outside of', 'außerhalb des Hauses'],
+          ['aufgrund', 'due to', 'aufgrund der Verspätung'],
+        ],
+      },
+    ],
+    drills: [
+      {
+        caption: 'des or der after the preposition?',
+        help: 'masc/neut → des (+s). fem/plural → der.',
+        headers: ['Phrase in English', 'German'],
+        rows: [
+          ['because of the rain (der Regen)', b('wegen des Regens')],
+          ['during the film (der Film)', b('während des Films')],
+          ['despite the cold (die Kälte)', b('trotz der Kälte')],
+          ['instead of the woman (die Frau)', b('statt der Frau', 'anstatt der Frau')],
+        ],
+      },
+    ],
+  },
+  'cases-dessen': {
+    category: 'cases',
+    level: 'B1',
+    title: 'dessen & deren',
+    teaser: 'Whose, in a relative clause. The genitive cousins of his / her / their.',
+    wordIds: ['mann', 'frau', 'kind', 'leute', 'auto', 'haus'],
+    points: [
+      'dessen / deren mean whose. They agree with the owner, not with the thing owned.',
+      'Owner is der or das → dessen. Owner is die (fem. or plural) → deren.',
+      'No article after them: der Mann, dessen Auto rot ist. Not dessen das Auto.',
+      'This is how German says “the man whose car…” instead of stacking another sein.',
+    ],
+    examples: [
+      { de: 'Der Mann, dessen Hund bellt, wohnt hier.', en: 'The man whose dog is barking lives here.' },
+      { de: 'Die Frau, deren Tasche fehlt, wartet.', en: 'The woman whose bag is missing is waiting.' },
+      { de: 'Das Kind, dessen Buch ich habe, heißt Lea.', en: 'The child whose book I have is called Lea.' },
+      { de: 'Die Leute, deren Haus alt ist, ziehen um.', en: 'The people whose house is old are moving.' },
+    ],
+    tables: [
+      {
+        caption: 'Pick dessen or deren',
+        headers: ['Owner', 'Form', 'Example'],
+        rows: [
+          ['der Mann (masc.)', 'dessen', 'der Mann, dessen Auto …'],
+          ['das Kind (neut.)', 'dessen', 'das Kind, dessen Buch …'],
+          ['die Frau (fem.)', 'deren', 'die Frau, deren Hund …'],
+          ['die Leute (plural)', 'deren', 'die Leute, deren Haus …'],
+        ],
+      },
+    ],
+    drills: [
+      {
+        caption: 'dessen or deren?',
+        headers: ['Start of the sentence', 'whose-word'],
+        rows: [
+          ['der Lehrer, ___ Kurs gut ist', b('dessen')],
+          ['die Lehrerin, ___ Kurs gut ist', b('deren')],
+          ['das Hotel, ___ Zimmer teuer sind', b('dessen')],
+          ['die Gäste, ___ Koffer fehlt', b('deren')],
+        ],
+      },
+    ],
+  },
+}
+
+export const casePracticeDrills = [pronounDrill, possessiveSeinDrill, possessiveIhrDrill, thatDrill]
