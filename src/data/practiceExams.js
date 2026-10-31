@@ -21,6 +21,8 @@ export const officialSampleLinks = [
   },
 ]
 
+const publicFile = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`
+
 export const practiceExams = [
   {
     id: 'a1-practice',
@@ -28,7 +30,7 @@ export const practiceExams = [
     title: 'Hallo Deutsch A1 Practice',
     style: 'Start Deutsch 1 style · original classroom paper',
     duration: 'about 65 min written + 15 min speaking',
-    pdf: '/exams/hallo-a1-practice.pdf',
+    pdf: publicFile('/exams/hallo-a1-practice.pdf'),
     intro:
       'An original A1 paper in the Goethe / telc Start Deutsch 1 shape: Lesen, Hören (transcript), Schreiben, Sprechen, plus a short grammar box. Not an official paper.',
     sections: [
@@ -234,7 +236,7 @@ export const practiceExams = [
     title: 'Hallo Deutsch A2 Practice',
     style: 'Goethe-Zertifikat A2 / telc A2 style · original',
     duration: 'about 90 min written + 15 min speaking',
-    pdf: '/exams/hallo-a2-practice.pdf',
+    pdf: publicFile('/exams/hallo-a2-practice.pdf'),
     intro:
       'Original A2 tasks: a denser email, notice matching, a phone message, Perfekt, a three-bullet email, and a planning dialogue.',
     sections: [
@@ -389,7 +391,7 @@ export const practiceExams = [
     title: 'Hallo Deutsch B1 Practice',
     style: 'Goethe / ÖSD B1 module mix · original',
     duration: 'about 65 min Lesen sample + 60 min Schreiben sample + speaking',
-    pdf: '/exams/hallo-b1-practice.pdf',
+    pdf: publicFile('/exams/hallo-b1-practice.pdf'),
     intro:
       'Original B1-style tasks: a press paragraph, forum stances, a formal email, a forum opinion, and speaking prompts. Modular like Goethe B1 — practise one skill at a time if you like.',
     sections: [
@@ -555,7 +557,7 @@ export const practiceExams = [
     title: 'A1 Grammar & Vocab Quiz',
     style: 'Classroom quiz · articles, verbs, everyday words',
     duration: '20 min',
-    pdf: '/exams/hallo-a1-grammar-quiz.pdf',
+    pdf: publicFile('/exams/hallo-a1-grammar-quiz.pdf'),
     intro: 'A short original quiz if you want a timed paper without the full four skills.',
     sections: [
       {
