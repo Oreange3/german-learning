@@ -1209,8 +1209,8 @@ h3 .muted {
   padding: 22px 18px 14px;
   text-align: center;
   color: var(--paper-ink);
-  background: var(--paper);
-  border: 1px solid #e0d5c4;
+  background: #e6dece;
+  border: 1px solid #cfc3b0;
 }
 
 .flash-kicker {
@@ -1253,7 +1253,7 @@ h3 .muted {
   padding: 10px 12px;
   text-align: left;
   color: var(--paper-ink);
-  background: #fffdf8;
+  background: #efe8da;
   border: 1px solid #cfc3b0;
   font: 16px/1.4 Tahoma, Verdana, Geneva, sans-serif;
   cursor: pointer;
@@ -1268,21 +1268,21 @@ h3 .muted {
 }
 
 .choice-btn.choice-right {
-  background: #f6e4cf;
-  border-color: #c56a16;
+  background: #cfe8c4;
+  border-color: #2f7d3a;
 }
 
 .choice-btn.choice-wrong {
-  background: #f6e6e3;
-  border-color: #a85a52;
+  background: #f3c9c4;
+  border-color: #b42318;
 }
 
 .flash.is-right {
-  border-color: #e0b48a;
+  border-color: #2f7d3a;
 }
 
 .flash.is-wrong {
-  border-color: #d7b1ab;
+  border-color: #b42318;
 }
 
 .flash-result {
@@ -1295,23 +1295,23 @@ h3 .muted {
 
 .flash .flash-result {
   color: var(--paper-ink);
-  background: #fffdf8;
-  border-color: #e0d5c4;
+  background: #efe8da;
+  border-color: #cfc3b0;
 }
 
 .flash.is-right .flash-result {
-  background: #f6e4cf;
-  border-color: #e0b48a;
+  background: #cfe8c4;
+  border-color: #2f7d3a;
 }
 
 .flash.is-wrong .flash-result {
-  background: #f6e6e3;
-  border-color: #d7b1ab;
+  background: #f3c9c4;
+  border-color: #b42318;
 }
 
 .flash .btn {
   color: var(--paper-ink);
-  background: #fffdf8;
+  background: #efe8da;
   border: 1px solid #cfc3b0;
 }
 
