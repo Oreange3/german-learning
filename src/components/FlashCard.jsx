@@ -10,12 +10,15 @@ export default function FlashCard({
   nextLabel,
   onAnswered,
   onNext,
+  settled,
 }) {
   const [picked, setPicked] = useState(null)
   const [unsure, setUnsure] = useState(false)
   const [showTranslation, setShowTranslation] = useState(false)
-  const revealed = picked !== null || unsure
-  const right = picked === answer
+  const shownPicked = settled ? (settled.skipped ? null : settled.picked) : picked
+  const shownUnsure = settled ? Boolean(settled.skipped) : unsure
+  const revealed = Boolean(settled) || shownPicked !== null || shownUnsure
+  const right = shownPicked === answer
   const onNextRef = useRef(onNext)
 
   useEffect(() => {
@@ -23,13 +26,13 @@ export default function FlashCard({
   }, [onNext])
 
   useEffect(() => {
-    if (!unsure) return undefined
+    if (settled || !unsure) return undefined
     const timer = setTimeout(() => onNextRef.current?.(true), 900)
     return () => clearTimeout(timer)
-  }, [unsure])
+  }, [settled, unsure])
 
   function choose(choice) {
-    if (revealed) return
+    if (settled || revealed) return
     primeAudio()
     setPicked(choice)
     const correct = choice === answer
@@ -38,12 +41,12 @@ export default function FlashCard({
   }
 
   function markUnsure() {
-    if (revealed) return
+    if (settled || revealed) return
     setUnsure(true)
     onAnswered?.({ correct: false, picked: 'Unsure', skipped: true })
   }
 
-  const tone = unsure ? ' is-skipped' : revealed ? (right ? ' is-right' : ' is-wrong') : ''
+  const tone = shownUnsure ? ' is-skipped' : revealed ? (right ? ' is-right' : ' is-wrong') : ''
 
   return (
     <article className={`flash${tone}`}>
@@ -54,11 +57,11 @@ export default function FlashCard({
       <div className="flash-choices" role="group" aria-label="Answers">
         {choices.map((choice) => {
           let mark = ''
-          if (!unsure && revealed && choice === answer) mark = ' · correct'
-          else if (!unsure && revealed && choice === picked) mark = ' · your pick'
-          const showRight = !unsure && revealed && choice === answer
-          const showWrong = !unsure && revealed && choice === picked && choice !== answer
-          const showAnswer = unsure && choice === answer
+          if (!shownUnsure && revealed && choice === answer) mark = ' · correct'
+          else if (!shownUnsure && revealed && choice === shownPicked) mark = ' · your pick'
+          const showRight = !shownUnsure && revealed && choice === answer
+          const showWrong = !shownUnsure && revealed && choice === shownPicked && choice !== answer
+          const showAnswer = shownUnsure && choice === answer
           return (
             <button
               key={choice}
@@ -80,7 +83,7 @@ export default function FlashCard({
         <button type="button" className="btn" onClick={() => setShowTranslation((open) => !open)}>
           Show translation
         </button>
-        {revealed ? null : (
+        {revealed || settled ? null : (
           <button type="button" className="btn" onClick={markUnsure}>
             Unsure
           </button>
@@ -88,7 +91,7 @@ export default function FlashCard({
       </p>
       {revealed ? (
         <p className="flash-result" role="status">
-          {unsure ? (
+          {shownUnsure ? (
             <>
               Unsure. The answer is <strong lang="de">{answer}</strong>.
             </>
@@ -99,7 +102,7 @@ export default function FlashCard({
           )}
         </p>
       ) : null}
-      {revealed && !unsure && onNext ? (
+      {revealed && !settled && !shownUnsure && onNext ? (
         <p>
           <button type="button" className="btn btn-gold" onClick={() => onNext(false)}>
             {nextLabel || 'Next'}

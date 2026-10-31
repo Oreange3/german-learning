@@ -87,6 +87,8 @@ export default function LesenGame() {
           id: item.id,
           kicker: dailyText.title,
           prompt: source.prompt,
+          choices: source.choices,
+          passage: { title: dailyText.title, text: dailyText.text },
           picked: item.skipped ? 'Unsure' : item.picked || (item.correct ? source.answer : '—'),
           answer: source.answer,
           correct: Boolean(item.correct) && !item.skipped,
@@ -126,6 +128,8 @@ export default function LesenGame() {
           id: `${question.id}-${prev.length}`,
           kicker: text.title,
           prompt: question.prompt,
+          choices: question.choices,
+          passage: { title: text.title, text: text.text },
           picked: skipped ? 'Unsure' : picked,
           answer: question.answer,
           correct: skipped ? false : correct,
@@ -222,50 +226,46 @@ export default function LesenGame() {
           : `Practice: ${session.correct} correct out of ${session.seen}. End closes this round.`}
       </p>
       {showReview ? (
-        <>
-          {mode === 'daily' ? (
-            <p className="hint">
-              Today&apos;s {level} text is done. {dailyCorrect} correct.
-            </p>
-          ) : (
-            <p className="hint">This round: {session.correct} correct out of {session.seen}.</p>
-          )}
-          <RoundReview
-            key={slides.map((item) => item.id).join('|')}
-            slides={slides}
-            onNewRound={mode === 'practice' ? newRound : null}
+        <p className="hint">
+          {mode === 'daily'
+            ? `Today's ${level} text is done. ${dailyCorrect} correct.`
+            : `This round: ${session.correct} correct out of ${session.seen}.`}
+        </p>
+      ) : null}
+      {mode === 'practice' && !showReview && round.length > 0 ? (
+        <p>
+          <button type="button" className="btn" onClick={() => setReviewOn(true)}>
+            End
+          </button>
+        </p>
+      ) : null}
+      <RoundReview
+        key={`${mode}-${level}`}
+        slides={slides}
+        liveId={showReview ? null : question?.id}
+        review={showReview}
+        onNewRound={mode === 'practice' ? newRound : null}
+      >
+        {text ? (
+          <article className="passage">
+            <h3 lang="de">{text.title}</h3>
+            <p lang="de">{text.text}</p>
+          </article>
+        ) : null}
+        {question ? (
+          <FlashCard
+            key={`${mode}-${level}-${question.id}`}
+            kicker="Question"
+            prompt={question.prompt}
+            translation={readingTranslation(text, question)}
+            choices={question.choices}
+            answer={question.answer}
+            nextLabel={mode === 'daily' ? (onLastDaily ? 'End' : 'Next question') : 'Next'}
+            onAnswered={onAnswered}
+            onNext={onNext}
           />
-        </>
-      ) : (
-        <>
-          {text ? (
-            <article className="passage">
-              <h3 lang="de">{text.title}</h3>
-              <p lang="de">{text.text}</p>
-            </article>
-          ) : null}
-          {mode === 'practice' && round.length > 0 ? (
-            <p>
-              <button type="button" className="btn" onClick={() => setReviewOn(true)}>
-                End
-              </button>
-            </p>
-          ) : null}
-          {question ? (
-            <FlashCard
-              key={`${mode}-${level}-${question.id}`}
-              kicker="Question"
-              prompt={question.prompt}
-              translation={readingTranslation(text, question)}
-              choices={question.choices}
-              answer={question.answer}
-              nextLabel={mode === 'daily' ? (onLastDaily ? 'End' : 'Next question') : 'Next'}
-              onAnswered={onAnswered}
-              onNext={onNext}
-            />
-          ) : null}
-        </>
-      )}
+        ) : null}
+      </RoundReview>
     </section>
   )
 }

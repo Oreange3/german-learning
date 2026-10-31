@@ -62,6 +62,7 @@ export default function PronounGame() {
           id: item.id,
           kicker: 'Pronoun',
           prompt: source.prompt,
+          choices: source.choices,
           picked: item.skipped ? 'Unsure' : item.picked || (item.correct ? source.answer : '—'),
           answer: source.answer,
           correct: Boolean(item.correct) && !item.skipped,
@@ -100,6 +101,7 @@ export default function PronounGame() {
           id: `${card.id}-${prev.length}`,
           kicker: 'Pronoun',
           prompt: card.prompt,
+          choices: card.choices,
           picked: skipped ? 'Unsure' : picked,
           answer: card.answer,
           correct: skipped ? false : correct,
@@ -178,44 +180,40 @@ export default function PronounGame() {
           : `Practice: ${session.correct} correct out of ${session.seen}. End closes this round.`}
       </p>
       {showReview ? (
-        <>
-          {mode === 'daily' ? (
-            <p className="hint">
-              Today&apos;s pronoun set is done. {dailyCorrect} correct.
-            </p>
-          ) : (
-            <p className="hint">This round: {session.correct} correct out of {session.seen}.</p>
-          )}
-          <RoundReview
-            key={slides.map((item) => item.id).join('|')}
-            slides={slides}
-            onNewRound={mode === 'practice' ? newRound : null}
+        <p className="hint">
+          {mode === 'daily'
+            ? `Today's pronoun set is done. ${dailyCorrect} correct.`
+            : `This round: ${session.correct} correct out of ${session.seen}.`}
+        </p>
+      ) : null}
+      {mode === 'practice' && !showReview && round.length > 0 ? (
+        <p>
+          <button type="button" className="btn" onClick={() => setReviewOn(true)}>
+            End
+          </button>
+        </p>
+      ) : null}
+      <RoundReview
+        key={mode}
+        slides={slides}
+        liveId={showReview ? null : card?.id}
+        review={showReview}
+        onNewRound={mode === 'practice' ? newRound : null}
+      >
+        {card ? (
+          <FlashCard
+            key={`${mode}-${card.id}`}
+            kicker="Pronoun"
+            prompt={card.prompt}
+            translation={card.hint}
+            choices={card.choices}
+            answer={card.answer}
+            nextLabel={mode === 'daily' ? (onLastDaily ? 'End' : 'Next') : 'New card'}
+            onAnswered={onAnswered}
+            onNext={onNext}
           />
-        </>
-      ) : (
-        <>
-          {mode === 'practice' && round.length > 0 ? (
-            <p>
-              <button type="button" className="btn" onClick={() => setReviewOn(true)}>
-                End
-              </button>
-            </p>
-          ) : null}
-          {card ? (
-            <FlashCard
-              key={`${mode}-${card.id}`}
-              kicker="Pronoun"
-              prompt={card.prompt}
-              translation={card.hint}
-              choices={card.choices}
-              answer={card.answer}
-              nextLabel={mode === 'daily' ? (onLastDaily ? 'End' : 'Next') : 'New card'}
-              onAnswered={onAnswered}
-              onNext={onNext}
-            />
-          ) : null}
-        </>
-      )}
+        ) : null}
+      </RoundReview>
     </section>
   )
 }

@@ -1,10 +1,38 @@
 import { useEffect, useState } from 'react'
+import FlashCard from './FlashCard.jsx'
 
-export default function RoundReview({ slides, onNewRound }) {
-  const [index, setIndex] = useState(0)
+function earlierIndex(cursor, slides, liveId) {
+  if (!slides.length) return null
+  const last = slides.length - 1
+  if (cursor === null) {
+    if (slides[last]?.id === liveId) return last > 0 ? last - 1 : null
+    return last
+  }
+  return cursor > 0 ? cursor - 1 : null
+}
+
+function laterIndex(cursor, slides, liveId, review) {
+  if (cursor === null) return null
+  const last = slides.length - 1
+  if (cursor < last) {
+    const next = cursor + 1
+    if (!review && slides[next]?.id === liveId) return null
+    return next
+  }
+  return review ? null : null
+}
+
+export default function RoundReview({ slides, liveId, review = true, onNewRound, children }) {
+  const [cursor, setCursor] = useState(() => (review ? Math.max(0, slides.length - 1) : null))
   const last = Math.max(0, slides.length - 1)
-  const safe = Math.min(index, last)
-  const slide = slides[safe]
+  const safe = cursor === null ? null : Math.min(cursor, last)
+  const slide = safe === null ? null : slides[safe]
+  const canBack = earlierIndex(safe, slides, liveId) !== null
+  const canForward = safe !== null && (laterIndex(safe, slides, liveId, review) !== null || !review)
+
+  useEffect(() => {
+    setCursor(review ? Math.max(0, slides.length - 1) : null)
+  }, [review])
 
   useEffect(() => {
     function onKey(event) {
@@ -12,77 +40,76 @@ export default function RoundReview({ slides, onNewRound }) {
       if (tag === 'INPUT' || tag === 'TEXTAREA' || event.target?.isContentEditable) return
       if (event.key === 'ArrowLeft') {
         event.preventDefault()
-        setIndex((current) => Math.max(0, current - 1))
+        setCursor((current) => {
+          const next = earlierIndex(current, slides, liveId)
+          return next === null ? current : next
+        })
       } else if (event.key === 'ArrowRight') {
         event.preventDefault()
-        setIndex((current) => Math.min(last, current + 1))
+        setCursor((current) => {
+          if (current === null) return null
+          const next = laterIndex(current, slides, liveId, review)
+          return next === null ? (review ? current : null) : next
+        })
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [last])
+  }, [liveId, review, slides])
 
-  if (!slide) return null
+  function goBack() {
+    const next = earlierIndex(safe, slides, liveId)
+    if (next !== null) setCursor(next)
+  }
 
-  const tone = slide.skipped ? 'is-skipped' : slide.correct ? 'is-right' : 'is-wrong'
+  function goForward() {
+    if (safe === null) return
+    const next = laterIndex(safe, slides, liveId, review)
+    if (next === null && review) return
+    setCursor(next)
+  }
+
+  const passage = slide?.passage
+  const total = slides.length
+  const count = total && safe !== null ? `card ${safe + 1} of ${total}` : null
 
   return (
-    <section className={`flash review-slide ${tone}`} aria-label="Review">
-      <p className="review-count">
-        card {safe + 1} of {slides.length}
-      </p>
-      {slide.kicker ? <p className="flash-kicker">{slide.kicker}</p> : null}
-      <p className="flash-word" lang="de">
-        {slide.prompt}
-      </p>
-      {slide.skipped ? (
-        <>
-          <p className="review-line">Skipped</p>
-          <p className="review-line">
-            Your action: <strong>Unsure</strong>
+    <div className="slide-row">
+      <button type="button" className="slide-arrow" aria-label="Previous card" disabled={!canBack} onClick={goBack}>
+        ←
+      </button>
+      <div className="slide-body">
+        {passage ? (
+          <article className="passage">
+            <h3 lang="de">{passage.title}</h3>
+            <p lang="de">{passage.text}</p>
+          </article>
+        ) : null}
+        {count ? <p className="review-count">{count}</p> : null}
+        {slide ? (
+          <FlashCard
+            key={slide.id}
+            kicker={slide.kicker}
+            prompt={slide.prompt}
+            translation={slide.translation}
+            choices={slide.choices || []}
+            answer={slide.answer}
+            settled={{ picked: slide.picked, skipped: slide.skipped }}
+          />
+        ) : (
+          children
+        )}
+        {review && onNewRound ? (
+          <p>
+            <button type="button" className="btn btn-gold" onClick={onNewRound}>
+              New round
+            </button>
           </p>
-          <p className="review-line">
-            Right answer: <strong lang="de">{slide.answer}</strong>
-          </p>
-          {slide.translation ? <p className="review-line review-translation">Translation: {slide.translation}</p> : null}
-        </>
-      ) : (
-        <>
-          <p className="review-line">
-            Your answer: <strong lang="de">{slide.picked}</strong>
-          </p>
-          <p className="review-line">
-            Right answer: <strong lang="de">{slide.answer}</strong>
-          </p>
-        </>
-      )}
-      <div className="review-nav">
-        <button
-          type="button"
-          className="btn"
-          disabled={safe === 0}
-          onClick={() => setIndex(safe - 1)}
-          aria-label="Previous card"
-        >
-          ←
-        </button>
-        <button
-          type="button"
-          className="btn"
-          disabled={safe === last}
-          onClick={() => setIndex(safe + 1)}
-          aria-label="Next card"
-        >
-          →
-        </button>
+        ) : null}
       </div>
-      {onNewRound ? (
-        <p>
-          <button type="button" className="btn btn-gold" onClick={onNewRound}>
-            New round
-          </button>
-        </p>
-      ) : null}
-    </section>
+      <button type="button" className="slide-arrow" aria-label="Next card" disabled={!canForward} onClick={goForward}>
+        →
+      </button>
+    </div>
   )
 }

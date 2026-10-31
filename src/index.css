@@ -1373,15 +1373,35 @@ h3 .muted {
   text-align: left;
 }
 
-.review-nav {
-  display: flex;
-  justify-content: center;
+.slide-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
   gap: 8px;
+  align-items: center;
 }
 
-.review-nav .btn {
-  margin: 0;
-  min-width: 48px;
+.slide-arrow {
+  width: 44px;
+  height: 72px;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  font: 22px/1 Georgia, 'Times New Roman', serif;
+  cursor: pointer;
+}
+
+.slide-arrow:hover:not(:disabled) {
+  border-color: var(--ink);
+}
+
+.slide-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.slide-body {
+  min-width: 0;
 }
 
 @media (max-width: 1060px) {

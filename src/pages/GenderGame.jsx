@@ -71,6 +71,7 @@ export default function GenderGame() {
           id: item.id,
           kicker: `${caseLabel} · ${source.numberLabel}`,
           prompt: source.form,
+          choices: source.choices,
           picked: item.skipped ? 'Unsure' : item.picked || (item.correct ? source.answer : '—'),
           answer: source.answer,
           correct: Boolean(item.correct) && !item.skipped,
@@ -109,6 +110,7 @@ export default function GenderGame() {
           id: `${card.id}-${prev.length}`,
           kicker: `${caseLabel} · ${card.numberLabel}`,
           prompt: card.form,
+          choices: card.choices,
           picked: skipped ? 'Unsure' : picked,
           answer: card.answer,
           correct: skipped ? false : correct,
@@ -206,44 +208,40 @@ export default function GenderGame() {
           : `Practice: ${session.correct} correct out of ${session.seen}. End closes this round.`}
       </p>
       {showReview ? (
-        <>
-          {mode === 'daily' ? (
-            <p className="hint">
-              Today&apos;s {caseLabel} set is done. {dailyCorrect} correct.
-            </p>
-          ) : (
-            <p className="hint">This round: {session.correct} correct out of {session.seen}.</p>
-          )}
-          <RoundReview
-            key={slides.map((item) => item.id).join('|')}
-            slides={slides}
-            onNewRound={mode === 'practice' ? newRound : null}
+        <p className="hint">
+          {mode === 'daily'
+            ? `Today's ${caseLabel} set is done. ${dailyCorrect} correct.`
+            : `This round: ${session.correct} correct out of ${session.seen}.`}
+        </p>
+      ) : null}
+      {mode === 'practice' && !showReview && round.length > 0 ? (
+        <p>
+          <button type="button" className="btn" onClick={() => setReviewOn(true)}>
+            End
+          </button>
+        </p>
+      ) : null}
+      <RoundReview
+        key={`${mode}-${caseId}`}
+        slides={slides}
+        liveId={showReview ? null : card?.id}
+        review={showReview}
+        onNewRound={mode === 'practice' ? newRound : null}
+      >
+        {card ? (
+          <FlashCard
+            key={`${mode}-${caseId}-${card.id}`}
+            kicker={`${caseLabel} · ${card.numberLabel}`}
+            prompt={card.form}
+            translation={card.en}
+            choices={card.choices}
+            answer={card.answer}
+            nextLabel={mode === 'daily' ? (onLastDaily ? 'End' : 'Next') : 'New card'}
+            onAnswered={onAnswered}
+            onNext={onNext}
           />
-        </>
-      ) : (
-        <>
-          {mode === 'practice' && round.length > 0 ? (
-            <p>
-              <button type="button" className="btn" onClick={() => setReviewOn(true)}>
-                End
-              </button>
-            </p>
-          ) : null}
-          {card ? (
-            <FlashCard
-              key={`${mode}-${caseId}-${card.id}`}
-              kicker={`${caseLabel} · ${card.numberLabel}`}
-              prompt={card.form}
-              translation={card.en}
-              choices={card.choices}
-              answer={card.answer}
-              nextLabel={mode === 'daily' ? (onLastDaily ? 'End' : 'Next') : 'New card'}
-              onAnswered={onAnswered}
-              onNext={onNext}
-            />
-          ) : null}
-        </>
-      )}
+        ) : null}
+      </RoundReview>
     </section>
   )
 }
