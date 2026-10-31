@@ -1,0 +1,1 @@
+function e(e){return!e||typeof e!=`object`?[]:(Array.isArray(e.answer)?e.answer:[e.answer]).filter(Boolean)}function t(e){return!!(e&&typeof e==`object`&&`answer`in e)}function n(e,t,n,r,i=2){let a=n.id||n.de||String(t),o=r[a]||0;if(o>=i)return e;r[a]=o+1;let s=e.slice(),c=Math.min(s.length,t+4);return s.splice(c,0,n),s}export{t as n,n as r,e as t};
