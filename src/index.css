@@ -1331,10 +1331,16 @@ h3 .muted {
 
 .article-gap {
   display: inline-block;
-  min-width: 2.6em;
-  margin: 0 0.2em;
+  min-width: 2.4em;
+  margin: 0 0.15em;
+  padding: 0 0.2em;
   border-bottom: 2px solid #1c1915;
   text-align: center;
+}
+
+.article-gap.is-filled {
+  min-width: 0;
+  font-weight: bold;
 }
 
 .flash-hint {

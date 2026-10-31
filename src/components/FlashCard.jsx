@@ -47,6 +47,7 @@ export default function FlashCard({
   }
 
   const tone = shownUnsure ? ' is-skipped' : revealed ? (right ? ' is-right' : ' is-wrong') : ''
+  const gapWord = revealed ? answer : ''
 
   return (
     <article className={`flash${tone}`}>
@@ -58,8 +59,8 @@ export default function FlashCard({
             <span key={`${bit}-${index}`}>
               {bit}
               {index < bits.length - 1 ? (
-                <span className="article-gap" aria-label="article">
-                  ___
+                <span className={`article-gap${gapWord ? ' is-filled' : ''}`} aria-label={gapWord || 'article'}>
+                  {gapWord || '\u00a0'}
                 </span>
               ) : null}
             </span>
