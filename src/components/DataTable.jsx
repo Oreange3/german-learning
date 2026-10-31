@@ -6,8 +6,8 @@ export default function DataTable({ caption, headers, rows, className = '' }) {
       <table className="grid-table">
         <thead>
           <tr>
-            {headers.map((header) => (
-              <th key={header}>{header}</th>
+            {headers.map((header, index) => (
+              <th key={`${header}-${index}`}>{header}</th>
             ))}
           </tr>
         </thead>
