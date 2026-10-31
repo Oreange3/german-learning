@@ -309,6 +309,69 @@ textarea {
   margin-bottom: 14px;
 }
 
+.course-fold {
+  margin: 0 0 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.course-fold .course-fold {
+  background: #1a1816;
+}
+
+.course-fold > summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  color: var(--ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 20px;
+  line-height: 1.3;
+  list-style: none;
+}
+
+.course-fold .course-fold > summary {
+  font-size: 17px;
+}
+
+.course-fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+.course-fold > summary::before {
+  content: '▸';
+  flex: none;
+  width: 1.1em;
+  color: var(--muted);
+  font-family: Tahoma, Verdana, Geneva, sans-serif;
+}
+
+.course-fold[open] > summary::before {
+  content: '▾';
+}
+
+.course-fold-title {
+  flex: 1;
+}
+
+.course-fold-meta {
+  color: var(--muted);
+  font-family: Tahoma, Verdana, Geneva, sans-serif;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.course-fold:not([open]) > .course-fold-body {
+  display: none;
+}
+
+.course-fold-body {
+  padding: 0 14px 12px;
+}
+
 .sidebar .panel:last-child,
 .content .panel:last-child {
   margin-bottom: 0;

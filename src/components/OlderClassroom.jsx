@@ -120,34 +120,38 @@ export default function OlderClassroom() {
         ))}
       </ul>
       {courseBands.map((band) => (
-        <div key={band.id}>
-          <h3>
-            <span className="level-pill">{band.code}</span> {band.title}
-          </h3>
-          <p>{band.blurb}</p>
-          {band.modules.map((mod) => (
-            <div key={mod.id}>
-              <p>
-                <strong>
-                  Modul {mod.number}: {mod.title}
-                </strong>
-              </p>
-              <ul>
-                {mod.lessonIds.map((id) => {
-                  const item = getCourseLesson(id)
-                  if (!item) return null
-                  return (
-                    <li key={id}>
-                      <button type="button" className="linkish" onClick={() => setLessonId(id)}>
-                        L{item.number} {item.title}
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          ))}
-        </div>
+        <details key={band.id} className="course-fold">
+          <summary>
+            <span className="course-fold-title">
+              <span className="level-pill">{band.code}</span> {band.title}
+            </span>
+          </summary>
+          <div className="course-fold-body">
+            <p>{band.blurb}</p>
+            {band.modules.map((mod) => (
+              <div key={mod.id}>
+                <p>
+                  <strong>
+                    Modul {mod.number}: {mod.title}
+                  </strong>
+                </p>
+                <ul>
+                  {mod.lessonIds.map((id) => {
+                    const item = getCourseLesson(id)
+                    if (!item) return null
+                    return (
+                      <li key={id}>
+                        <button type="button" className="linkish" onClick={() => setLessonId(id)}>
+                          L{item.number} {item.title}
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </details>
       ))}
     </section>
   )

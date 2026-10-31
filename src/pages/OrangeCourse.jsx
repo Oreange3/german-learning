@@ -58,11 +58,22 @@ function LessonTable({ table }) {
   )
 }
 
+function Fold({ title, meta, children }) {
+  return (
+    <details className="course-fold">
+      <summary>
+        <span className="course-fold-title">{title}</span>
+        {meta ? <span className="course-fold-meta">{meta}</span> : null}
+      </summary>
+      <div className="course-fold-body">{children}</div>
+    </details>
+  )
+}
+
 function LessonBlock({ lesson }) {
   if (lesson.kind === 'words') {
     return (
-      <article className="panel">
-        <h3>{lesson.title}</h3>
+      <>
         <p>{lesson.text}</p>
         <div className="table-wrap">
           <table className="grid-table">
@@ -91,22 +102,16 @@ function LessonBlock({ lesson }) {
             {lesson.line.en}
           </p>
         ) : null}
-      </article>
+      </>
     )
   }
 
   if (lesson.kind === 'stub') {
-    return (
-      <article className="panel">
-        <h3>{lesson.title}</h3>
-        <p>{lesson.text}</p>
-      </article>
-    )
+    return <p>{lesson.text}</p>
   }
 
   return (
-    <article className="panel">
-      <h3>{lesson.title}</h3>
+    <>
       <p>{lesson.idea}</p>
       <LessonTable table={lesson.table} />
       {lesson.examples.map((example) => (
@@ -122,7 +127,7 @@ function LessonBlock({ lesson }) {
       {lesson.checks.map((item) => (
         <Check key={item.q} item={item} />
       ))}
-    </article>
+    </>
   )
 }
 
@@ -164,25 +169,23 @@ export default function OrangeCourse() {
         </p>
       </section>
 
-      <section className="panel">
-        <h2>Suggested study order</h2>
+      <Fold title="Suggested study order">
         <ol>
           {studyOrder.map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ol>
-      </section>
+      </Fold>
 
       {courseGroups.map((group) => (
-        <section key={group.id}>
-          <div className="panel">
-            <h2>{group.title}</h2>
-            <p>{group.blurb}</p>
-          </div>
+        <Fold key={group.id} title={group.title} meta={`${group.lessons.length} parts`}>
+          <p>{group.blurb}</p>
           {group.lessons.map((lesson) => (
-            <LessonBlock key={lesson.id} lesson={lesson} />
+            <Fold key={lesson.id} title={lesson.title}>
+              <LessonBlock lesson={lesson} />
+            </Fold>
           ))}
-        </section>
+        </Fold>
       ))}
 
       <OlderGate />
