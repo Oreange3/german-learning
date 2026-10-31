@@ -1,0 +1,697 @@
+/**
+ * Original course text for this class.
+ * The group names follow a familiar grammar-site shape.
+ * The wording, tables, examples, and lists were written here.
+ */
+
+function full(id, title, idea, headers, rows, examples, checks) {
+  return { id, title, kind: 'full', idea, table: { headers, rows }, examples, checks }
+}
+
+function stub(id, title, text) {
+  return { id, title, kind: 'stub', text }
+}
+
+function words(id, title, list) {
+  return { id, title, kind: 'words', text: 'Say each word with its article.', words: list }
+}
+
+function ex(de, en) {
+  return { de, en }
+}
+
+function check(q, a) {
+  return { q, a }
+}
+
+export const studyOrder = [
+  'Learn noun gender, then plurals, and say the article with every new noun.',
+  'Learn the present tense, then the short note on sein and haben.',
+  'Learn main-clause word order before you write your own sentences.',
+  'Learn the four cases. Use nominative and accusative first, then dative and genitive.',
+  'Learn personal pronouns in those cases, then negation.',
+  'Learn modal verbs and separable verbs.',
+  'Learn possessive words, then adjective endings.',
+  'Learn conjunctions, then the Perfekt.',
+  'Read the spelling and pronunciation notes while you play the daily games.',
+  'Use the vocabulary lists when a game gives you a noun you want to picture.',
+  'After that, open the older classroom for the long A1 to B2 book, the study lab, and the exam papers.',
+]
+
+const grammar = [
+  full(
+    'noun-gender',
+    'Noun gender',
+    'Every German noun is masculine, feminine, or neuter, and the article shows that gender.',
+    ['Gender', 'Article', 'Example'],
+    [
+      ['masculine', 'der', 'der Tisch'],
+      ['feminine', 'die', 'die Lampe'],
+      ['neuter', 'das', 'das Fenster'],
+    ],
+    [
+      ex('Der Hund schläft.', 'The dog is sleeping.'),
+      ex('Die Lampe ist neu, und das Fenster ist offen.', 'The lamp is new, and the window is open.'),
+    ],
+    [check('Which article goes with Buch?', 'das Buch'), check('Schule is feminine. Which article goes with it?', 'die Schule')],
+  ),
+  full(
+    'plurals',
+    'Plurals',
+    'Plural nouns use several endings, and the nominative plural article is always die.',
+    ['Singular', 'Plural', 'Pattern'],
+    [
+      ['der Tisch', 'die Tische', '-e'],
+      ['die Lampe', 'die Lampen', '-n'],
+      ['das Kind', 'die Kinder', '-er'],
+      ['der Vater', 'die Väter', 'umlaut'],
+      ['das Auto', 'die Autos', '-s'],
+    ],
+    [
+      ex('Die Kinder lesen die Bücher.', 'The children are reading the books.'),
+      ex('Die Häuser sind alt, und die Autos sind neu.', 'The houses are old, and the cars are new.'),
+    ],
+    [check('What is the plural of der Stuhl?', 'die Stühle'), check('Which article is used for every nominative plural?', 'die')],
+  ),
+  full(
+    'cases',
+    'The four cases',
+    'Case shows the job of a noun, and the definite article changes with the case.',
+    ['Case', 'masculine', 'feminine', 'neuter', 'plural'],
+    [
+      ['Nominative', 'der', 'die', 'das', 'die'],
+      ['Accusative', 'den', 'die', 'das', 'die'],
+      ['Dative', 'dem', 'der', 'dem', 'den'],
+      ['Genitive', 'des', 'der', 'des', 'der'],
+    ],
+    [
+      ex('Der Mann gibt dem Kind den Apfel.', 'The man gives the child the apple.'),
+      ex('Ich helfe den Kindern im Garten des Hauses.', 'I help the children in the garden of the house.'),
+    ],
+    [
+      check('Ich sehe ___ Hund. (the dog, direct object)', 'den'),
+      check('Ich danke ___ Frau. (danken takes the dative)', 'der'),
+    ],
+  ),
+  full(
+    'personal-pronouns',
+    'Personal pronouns',
+    'A personal pronoun stands for a person or a thing, and its form changes with the case.',
+    ['Person', 'Nominative', 'Accusative', 'Dative'],
+    [
+      ['ich', 'ich', 'mich', 'mir'],
+      ['du', 'du', 'dich', 'dir'],
+      ['er', 'er', 'ihn', 'ihm'],
+      ['sie (she)', 'sie', 'sie', 'ihr'],
+      ['es', 'es', 'es', 'ihm'],
+      ['wir', 'wir', 'uns', 'uns'],
+      ['ihr (you all)', 'ihr', 'euch', 'euch'],
+      ['sie (they)', 'sie', 'sie', 'ihnen'],
+      ['Sie (formal)', 'Sie', 'Sie', 'Ihnen'],
+    ],
+    [
+      ex('Ich sehe ihn, aber ich helfe ihr.', 'I see him, but I help her.'),
+      ex('Kannst du mir bitte das Buch geben?', 'Can you please give me the book?'),
+    ],
+    [
+      check('Er wartet auf ___. (me; auf takes the accusative here)', 'mich'),
+      check('Das Buch gehört ___. (him; gehören takes the dative)', 'ihm'),
+    ],
+  ),
+  full(
+    'possessive-pronouns',
+    'Possessive pronouns',
+    'A possessive word agrees with the thing that is owned, not with the owner.',
+    ['Owner', 'nom. masc. / neuter', 'nom. fem. / plural', 'acc. masculine'],
+    [
+      ['ich', 'mein', 'meine', 'meinen'],
+      ['du', 'dein', 'deine', 'deinen'],
+      ['er / es', 'sein', 'seine', 'seinen'],
+      ['sie (she)', 'ihr', 'ihre', 'ihren'],
+      ['wir', 'unser', 'unsere', 'unseren'],
+      ['ihr (you all)', 'euer', 'eure', 'euren'],
+      ['sie / Sie', 'ihr', 'ihre', 'ihren'],
+    ],
+    [
+      ex('Das ist mein Bruder, und das ist meine Schwester.', 'That is my brother, and that is my sister.'),
+      ex('Anna sucht ihre Tasche, und Paul sucht seinen Schlüssel.', 'Anna is looking for her bag, and Paul is looking for his key.'),
+    ],
+    [check('I + das Buch, as the subject.', 'mein Buch'), check('Paul is looking for his key. Fill the blank: Paul sucht ___ Schlüssel.', 'seinen')],
+  ),
+  full(
+    'adjective-endings',
+    'Adjective endings',
+    'An adjective before a noun takes an ending that depends on the article, the case, and the gender.',
+    ['Pattern', 'masculine', 'feminine', 'neuter', 'plural'],
+    [
+      ['after der, nominative', 'der alte Mann', 'die alte Frau', 'das alte Kind', 'die alten Bücher'],
+      ['after ein / mein, nominative', 'ein alter Mann', 'eine alte Frau', 'ein altes Kind', 'meine alten Bücher'],
+      ['no article, nominative', 'alter Mann', 'alte Frau', 'altes Kind', 'alte Bücher'],
+      ['after der, accusative', 'den alten Mann', 'die alte Frau', 'das alte Kind', 'die alten Bücher'],
+    ],
+    [
+      ex('Der kleine Hund schläft.', 'The little dog is sleeping.'),
+      ex('Ich kaufe einen roten Apfel.', 'I am buying a red apple.'),
+    ],
+    [check('das ___ Fenster (groß, nominative)', 'das große Fenster'), check('ein ___ Stuhl (neu, nominative)', 'ein neuer Stuhl')],
+  ),
+  full(
+    'present',
+    'Present tense',
+    'In the present tense the ending matches the subject, and the conjugated verb stays in second position in a statement.',
+    ['Person', 'wohnen', 'fahren'],
+    [
+      ['ich', 'wohne', 'fahre'],
+      ['du', 'wohnst', 'fährst'],
+      ['er / sie / es', 'wohnt', 'fährt'],
+      ['wir', 'wohnen', 'fahren'],
+      ['ihr', 'wohnt', 'fahrt'],
+      ['sie / Sie', 'wohnen', 'fahren'],
+    ],
+    [
+      ex('Ich wohne in Köln, und meine Schwester wohnt in Wien.', 'I live in Cologne, and my sister lives in Vienna.'),
+      ex('Du fährst langsam, aber er fährt schnell.', 'You drive slowly, but he drives fast.'),
+    ],
+    [check('du + kommen', 'du kommst'), check('er + fahren', 'er fährt')],
+  ),
+  stub(
+    'sein-haben',
+    'sein and haben',
+    'sein and haben are irregular in the present. sein: ich bin, du bist, er/sie/es ist, wir sind, ihr seid, sie/Sie sind. haben: ich habe, du hast, er/sie/es hat, wir haben, ihr habt, sie/Sie haben. Use sein for identity and place, as in Ich bin Anna and Ich bin zu Hause, and haben for possession, as in Ich habe ein Buch.',
+  ),
+  full(
+    'separable',
+    'Separable verbs',
+    'In a main clause the prefix of a separable verb goes to the end.',
+    ['Infinitive', 'Main clause'],
+    [
+      ['aufstehen', 'Ich stehe um 7 Uhr auf.'],
+      ['einkaufen', 'Anna kauft Brot ein.'],
+      ['anrufen', 'Er ruft mich an.'],
+      ['mitkommen', 'Kommst du mit?'],
+    ],
+    [
+      ex('Ich stehe um sieben Uhr auf.', 'I get up at seven.'),
+      ex('Sie ruft ihren Bruder an.', 'She is calling her brother.'),
+    ],
+    [check('Ich ___ um sechs Uhr ___. (aufstehen)', 'stehe ... auf'), check('Where does an go in Er ruft mich an?', 'At the end.')],
+  ),
+  stub(
+    'inseparable',
+    'Inseparable prefixes',
+    'Prefixes such as be-, er-, ver-, zer-, ent-, emp-, and miss- stay on the verb and are not stressed. The participle has no ge-: verkaufen becomes verkauft, and bekommen stays bekommen. In a main clause the prefix does not move: Ich verkaufe mein Fahrrad.',
+  ),
+  full(
+    'modals',
+    'Modal verbs',
+    'A modal verb takes the personal ending, and the main verb stays as a bare infinitive at the end.',
+    ['Person', 'können', 'müssen'],
+    [
+      ['ich', 'kann', 'muss'],
+      ['du', 'kannst', 'musst'],
+      ['er / sie / es', 'kann', 'muss'],
+      ['wir', 'können', 'müssen'],
+      ['ihr', 'könnt', 'müsst'],
+      ['sie / Sie', 'können', 'müssen'],
+    ],
+    [
+      ex('Ich kann heute nicht kommen.', 'I cannot come today.'),
+      ex('Darf ich das Fenster aufmachen?', 'May I open the window?'),
+    ],
+    [check('du + müssen', 'du musst'), check('Where is kaufen in Sie will Brot kaufen?', 'At the end.')],
+  ),
+  full(
+    'negation',
+    'Negation',
+    'Kein negates a noun, and nicht negates a verb, an adjective, or a specific phrase.',
+    ['Job', 'Example'],
+    [
+      ['a noun with ein, or with no article', 'kein Buch / keine Zeit'],
+      ['the verb', 'Er kommt nicht.'],
+      ['an adjective', 'nicht groß'],
+      ['one specific noun', 'nicht der rote Stift'],
+    ],
+    [
+      ex('Ich habe keinen Hund, aber ich habe eine Katze.', 'I do not have a dog, but I have a cat.'),
+      ex('Sie kommt heute nicht.', 'She is not coming today.'),
+    ],
+    [check('Ich habe ___ Zeit.', 'keine'), check('Das ist ___ mein Schlüssel.', 'nicht')],
+  ),
+  full(
+    'word-order',
+    'Word order',
+    'In a statement the conjugated verb stays in second position, even when a time or a place comes first.',
+    ['Position 1', 'Verb', 'Rest'],
+    [
+      ['Ich', 'trinke', 'morgens Kaffee.'],
+      ['Morgens', 'trinke', 'ich Kaffee.'],
+      ['Heute', 'kauft', 'sie Brot.'],
+      ['Nach der Schule', 'trifft', 'er seinen Freund.'],
+    ],
+    [
+      ex('Heute Abend bleibe ich zu Hause.', 'This evening I am staying at home.'),
+      ex('Im Park spielt das Kind.', 'The child is playing in the park.'),
+    ],
+    [check('Morgen ___ ich früh auf. (aufstehen)', 'stehe'), check('How do you fix Morgen ich gehe zur Schule?', 'Morgen gehe ich zur Schule.')],
+  ),
+  full(
+    'conjunctions',
+    'Conjunctions',
+    'Und, aber, oder, and denn keep normal word order, while weil, dass, and obwohl send the conjugated verb to the end.',
+    ['Word', 'Type', 'Verb'],
+    [
+      ['und', 'coordinating', 'stays second'],
+      ['aber', 'coordinating', 'stays second'],
+      ['denn', 'coordinating', 'stays second'],
+      ['weil', 'subordinating', 'goes to the end'],
+      ['dass', 'subordinating', 'goes to the end'],
+      ['obwohl', 'subordinating', 'goes to the end'],
+    ],
+    [
+      ex('Er lernt Deutsch, denn er will in Berlin arbeiten.', 'He is learning German, for he wants to work in Berlin.'),
+      ex('Er lernt Deutsch, weil er in Berlin arbeiten will.', 'He is learning German because he wants to work in Berlin.'),
+    ],
+    [
+      check('Ich bleibe zu Hause, ___ es regnet. (the verb goes to the end)', 'weil'),
+      check('Sie ist nett, ___ sie spricht sehr laut. (the verb stays second)', 'aber'),
+    ],
+  ),
+  full(
+    'perfekt',
+    'Perfekt',
+    'The Perfekt uses haben or sein in second position and the past participle at the end, and sein goes with movement, a change of state, sein, and bleiben.',
+    ['Verb', 'Participle', 'Helper'],
+    [
+      ['machen', 'gemacht', 'haben'],
+      ['kaufen', 'gekauft', 'haben'],
+      ['kommen', 'gekommen', 'sein'],
+      ['fahren', 'gefahren', 'sein'],
+      ['aufstehen', 'aufgestanden', 'sein'],
+    ],
+    [
+      ex('Ich habe gestern einen Kuchen gemacht.', 'I made a cake yesterday.'),
+      ex('Sie ist um acht Uhr nach Hause gekommen.', 'She came home at eight.'),
+    ],
+    [check('Wir ___ den Film gesehen.', 'haben'), check('Er ___ nach München gefahren.', 'ist')],
+  ),
+  stub(
+    'preteritum',
+    'Präteritum',
+    'The Präteritum is the simple past, and it is common in writing. Weak verbs add -te: ich machte, wir machten. sein and haben are the pair you also need in speech: ich war, du warst, er war, wir waren, ihr wart, sie waren; ich hatte, du hattest, er hatte, wir hatten, ihr hattet, sie hatten. In conversation, prefer the Perfekt for most other verbs.',
+  ),
+  stub(
+    'plusquamperfekt',
+    'Plusquamperfekt',
+    'The Plusquamperfekt is the past before another past. Use hatte or war plus the participle at the end. Ich hatte schon gegessen, als er kam. Sie war schon gegangen, bevor der Film anfing.',
+  ),
+  stub(
+    'futur',
+    'Futur I',
+    'Futur I uses a form of werden plus the infinitive at the end: ich werde, du wirst, er wird, wir werden, ihr werdet, sie werden. Ich werde dich morgen anrufen. For a plan that is already fixed, the present plus a time word is more usual: Ich rufe dich morgen an.',
+  ),
+  stub(
+    'passive',
+    'Passive',
+    'The Vorgangspassiv uses werden plus the past participle. In the present, Das Fenster wird geöffnet. If you name the person, use von plus the dative: Das Fenster wird von der Lehrerin geöffnet. The Perfekt passive is ist plus the participle plus worden: Das Fenster ist geöffnet worden.',
+  ),
+  stub(
+    'konjunktiv-ii',
+    'Konjunktiv II',
+    'Konjunktiv II is for something unreal or for a polite wish. The usual pattern is würde plus the infinitive at the end: Ich würde gern einen Kaffee trinken. Some verbs keep a short form: ich hätte, ich wäre, ich könnte. Hättest du Zeit? is a soft question.',
+  ),
+  stub(
+    'konjunktiv-i',
+    'Indirect speech',
+    'Careful writing can report speech with Konjunktiv I. The useful forms are sei and habe. Er sagt, er sei krank. Sie schreibt, sie habe keine Zeit. In everyday speech, dass plus the normal present is enough: Er sagt, dass er krank ist.',
+  ),
+  stub(
+    'imperative',
+    'Imperative',
+    'The du command is usually the verb stem: Komm! A separable prefix still goes to the end: Komm mit! Keep a vowel change: Sprich lauter! Add -e when the stem is hard to say alone, as in Arbeite! The ihr form matches the present, Kommt herein! The Sie form puts the infinitive first: Kommen Sie herein!',
+  ),
+  stub(
+    'reflexive',
+    'Reflexive verbs',
+    'A reflexive pronoun points back at the subject. It is accusative when it is the only object: Ich wasche mich. It is dative when another accusative object is there: Ich wasche mir die Hände. er, sie, es, and sie/Sie use sich.',
+  ),
+  stub(
+    'n-declension',
+    'Nouns with -n',
+    'A few masculine nouns add -n or -en in every case except the nominative singular. der Junge, den Jungen, dem Jungen, des Jungen. der Herr adds only -n: den Herrn, dem Herrn, des Herrn. der Student follows Junge: den Studenten.',
+  ),
+  stub(
+    'prep-acc',
+    'Prepositions with the accusative',
+    'These prepositions always take the accusative: durch, für, gegen, ohne, um. Ich gehe durch den Park. Sie kommt ohne ihren Schlüssel. The article or pronoun after them uses the accusative form.',
+  ),
+  stub(
+    'prep-dat',
+    'Prepositions with the dative',
+    'These prepositions always take the dative: aus, außer, bei, mit, nach, seit, von, zu. Ich fahre mit dem Bus. Er wohnt bei seiner Schwester. With most city names, use nach and no article: nach Berlin.',
+  ),
+  stub(
+    'prep-two-way',
+    'Two-way prepositions',
+    'an, auf, hinter, in, neben, über, unter, vor, and zwischen take the accusative for movement to a place and the dative for location. Ich lege das Buch auf den Tisch. Das Buch liegt auf dem Tisch. in plus dem becomes im, and an plus dem becomes am.',
+  ),
+  stub(
+    'prep-gen',
+    'Prepositions with the genitive',
+    'In careful writing, wegen, während, trotz, and statt take the genitive. Wir bleiben wegen des Regens zu Hause. Während der Pause spricht sie leise. trotz des Lärms and statt des Autos follow the same pattern.',
+  ),
+  stub(
+    'verb-prep',
+    'Verbs with a fixed preposition',
+    'Some verbs always keep the same preposition. warten auf and sich interessieren für take the accusative: Ich warte auf den Bus. Ich interessiere mich für Musik. anfangen mit takes the dative, and the prefix goes to the end: Wir fangen mit der Übung an.',
+  ),
+  stub(
+    'da-compounds',
+    'da- and wo- compounds',
+    'When a preposition refers to a thing, use da- or dar- plus the preposition instead of a personal pronoun. darauf, darüber, damit, and daran are common. You can say Ich warte auf den Bus, and later Ich warte darauf. A person still uses the pronoun: Ich warte auf ihn.',
+  ),
+  stub(
+    'relative',
+    'Relative clauses',
+    'A relative clause adds a fact about a noun, and the conjugated verb goes to the end. The pronoun matches that noun: der, die, das, or plural die. Das ist der Film, den ich gestern gesehen habe. Die Frau, der ich helfe, wohnt hier.',
+  ),
+  stub(
+    'infinitive-zu',
+    'Infinitive with zu',
+    'Put zu before an infinitive after um and after verbs such as versuchen and vergessen. The zu-phrase goes to the end: Ich lerne Deutsch, um in Wien zu arbeiten. With a separable verb, zu sits inside the word: aufzustehen. Ich versuche, morgen früh aufzustehen.',
+  ),
+  stub(
+    'comparison',
+    'Comparison',
+    'Short adjectives add -er and am ...-sten: klein, kleiner, am kleinsten. Many one-syllable adjectives also take an umlaut: alt, älter, am ältesten. Use als for a difference and so ... wie for a match: Er ist größer als ich, und sie ist so groß wie er. gut becomes besser and am besten.',
+  ),
+  stub(
+    'demonstrative',
+    'dieser',
+    'dieser points at one specific noun and takes the same style of ending as der. Nominative forms: dieser Mann, diese Frau, dieses Kind, diese Bücher. Accusative masculine is diesen: Ich nehme diesen Stift.',
+  ),
+  stub(
+    'questions',
+    'Question words',
+    'A question word usually stands first, and the conjugated verb stays second. Wer, was, wo, wohin, woher, wann, warum, wie, and wie viel cover most questions. Woher kommst du? Warum lernst du Deutsch?',
+  ),
+  stub(
+    'ordinals',
+    'Ordinal numbers',
+    'Ordinal numbers take adjective endings. der erste Tag, der zweite Stock, der dritte Mann. After am, which is an plus dem, use the dative ending: am ersten Mai, am zweiten Juni.',
+  ),
+  stub(
+    'countries',
+    'Countries and articles',
+    'Most country names have no article, so travel uses nach: nach Deutschland, nach Österreich, nach Frankreich. Some names keep an article: die Schweiz, die Türkei, der Iran, der Irak. Travel to those uses in plus the accusative: in die Schweiz, in den Iran.',
+  ),
+  stub(
+    'man',
+    'man',
+    'man means people in general, or a person you do not name, and the verb matches er. Man lernt hier langsam. Man darf das nicht. Do not use man when you mean one woman or one man you can point at.',
+  ),
+  stub(
+    'lassen',
+    'lassen',
+    'lassen plus a bare infinitive means that you have something done, or that you allow it. The infinitive goes to the end: Ich lasse das Fenster reparieren. The du command is lass: Lass mich bitte ausreden. The present du form in a statement is lässt.',
+  ),
+  stub(
+    'participle-adjective',
+    'Participles before a noun',
+    'A past participle can stand before a noun and take an adjective ending: das geschlossene Fenster, der gekaufte Pullover. A present participle works the same way: ein lesender Schüler. Choose the ending with the usual adjective rules.',
+  ),
+]
+
+const vocabulary = [
+  words('voc-family', 'Family', [
+    ['der Vater', 'father'],
+    ['die Mutter', 'mother'],
+    ['der Bruder', 'brother'],
+    ['die Schwester', 'sister'],
+    ['das Kind', 'child'],
+    ['die Eltern', 'parents'],
+    ['der Sohn', 'son'],
+    ['die Tochter', 'daughter'],
+    ['die Familie', 'family'],
+    ['der Großvater', 'grandfather'],
+    ['die Großmutter', 'grandmother'],
+    ['das Baby', 'baby'],
+  ]),
+  words('voc-home', 'Home', [
+    ['das Haus', 'house'],
+    ['die Wohnung', 'apartment'],
+    ['das Zimmer', 'room'],
+    ['die Küche', 'kitchen'],
+    ['das Bad', 'bathroom'],
+    ['die Tür', 'door'],
+    ['das Fenster', 'window'],
+    ['der Tisch', 'table'],
+    ['der Stuhl', 'chair'],
+    ['das Bett', 'bed'],
+    ['die Lampe', 'lamp'],
+    ['der Schrank', 'cupboard'],
+  ]),
+  words('voc-food', 'Food', [
+    ['das Brot', 'bread'],
+    ['die Butter', 'butter'],
+    ['der Käse', 'cheese'],
+    ['der Apfel', 'apple'],
+    ['die Banane', 'banana'],
+    ['das Ei', 'egg'],
+    ['die Milch', 'milk'],
+    ['das Wasser', 'water'],
+    ['der Kaffee', 'coffee'],
+    ['die Suppe', 'soup'],
+    ['das Fleisch', 'meat'],
+    ['der Reis', 'rice'],
+  ]),
+  words('voc-city', 'City and travel', [
+    ['die Stadt', 'city'],
+    ['die Straße', 'street'],
+    ['der Bahnhof', 'station'],
+    ['die Haltestelle', 'stop'],
+    ['der Bus', 'bus'],
+    ['die Bahn', 'train'],
+    ['das Auto', 'car'],
+    ['der Platz', 'square'],
+    ['die Brücke', 'bridge'],
+    ['das Hotel', 'hotel'],
+    ['die Kirche', 'church'],
+    ['der Park', 'park'],
+  ]),
+  words('voc-school', 'Work and school', [
+    ['die Schule', 'school'],
+    ['die Arbeit', 'work'],
+    ['der Lehrer', 'male teacher'],
+    ['die Lehrerin', 'female teacher'],
+    ['der Schüler', 'male pupil'],
+    ['die Schülerin', 'female pupil'],
+    ['das Heft', 'notebook'],
+    ['der Stift', 'pen'],
+    ['die Klasse', 'class'],
+    ['die Pause', 'break'],
+    ['der Beruf', 'profession'],
+    ['das Büro', 'office'],
+  ]),
+  words('voc-body', 'Body', [
+    ['der Kopf', 'head'],
+    ['das Auge', 'eye'],
+    ['die Nase', 'nose'],
+    ['der Mund', 'mouth'],
+    ['das Ohr', 'ear'],
+    ['die Hand', 'hand'],
+    ['der Arm', 'arm'],
+    ['das Bein', 'leg'],
+    ['der Fuß', 'foot'],
+    ['der Rücken', 'back'],
+    ['das Herz', 'heart'],
+    ['der Zahn', 'tooth'],
+  ]),
+  words('voc-weather', 'Weather and seasons', [
+    ['das Wetter', 'weather'],
+    ['die Sonne', 'sun'],
+    ['der Regen', 'rain'],
+    ['der Schnee', 'snow'],
+    ['der Wind', 'wind'],
+    ['die Wolke', 'cloud'],
+    ['der Nebel', 'fog'],
+    ['das Gewitter', 'thunderstorm'],
+    ['der Himmel', 'sky'],
+    ['die Temperatur', 'temperature'],
+    ['der Herbst', 'autumn'],
+    ['der Sommer', 'summer'],
+  ]),
+  words('voc-clothes', 'Clothes', [
+    ['das Hemd', 'shirt'],
+    ['die Hose', 'trousers'],
+    ['der Rock', 'skirt'],
+    ['das Kleid', 'dress'],
+    ['die Jacke', 'jacket'],
+    ['der Schuh', 'shoe'],
+    ['die Socke', 'sock'],
+    ['der Mantel', 'coat'],
+    ['die Mütze', 'cap'],
+    ['der Pullover', 'sweater'],
+    ['die Tasche', 'bag'],
+    ['der Gürtel', 'belt'],
+  ]),
+  words('voc-time', 'Time', [
+    ['die Sekunde', 'second'],
+    ['die Minute', 'minute'],
+    ['die Stunde', 'hour'],
+    ['der Tag', 'day'],
+    ['die Woche', 'week'],
+    ['der Monat', 'month'],
+    ['das Jahr', 'year'],
+    ['der Morgen', 'morning'],
+    ['der Abend', 'evening'],
+    ['die Nacht', 'night'],
+    ['die Uhr', 'clock'],
+    ['der Montag', 'Monday'],
+  ]),
+]
+
+const spelling = [
+  stub(
+    'spell-caps',
+    'Capital letters',
+    'German capitalizes every noun, including a nominalized adjective such as das Gute. The formal words Sie, Ihnen, and Ihr are capitalized. Adjectives and verbs are not capitalized in the middle of a sentence. ich is lowercase unless it starts the sentence.',
+  ),
+  stub(
+    'spell-eszett',
+    'ss and ß',
+    'Use ß after a long vowel or a diphthong: Straße, groß, heißen. Use ss after a short vowel: muss, Fluss, Schlüssel. In a line of capital letters, ß is written SS. This class uses ß, not the Swiss ss spelling.',
+  ),
+  stub(
+    'spell-long',
+    'Long vowels',
+    'ie often marks a long i, as in liegen and viel. A silent h after a vowel also lengthens it: Zahl, Uhr, gehen. A doubled vowel is long as well: Saal, Boot, Meer.',
+  ),
+  stub(
+    'spell-short',
+    'Short vowels',
+    'A doubled consonant marks a short vowel before it: Mitte, kommen, Tasse, bitte. ck does the same job: backen, Stück. Do not double the consonant after a long vowel.',
+  ),
+  stub(
+    'spell-comma',
+    'Commas',
+    'Put a comma before a subordinate clause, including weil, dass, obwohl, wenn, and ob. Ich bleibe hier, weil es regnet. Do not put a comma between two words that und only joins: Brot und Käse. A relative clause is also set off with commas: Der Mann, den ich sehe, wartet.',
+  ),
+  stub(
+    'spell-compound',
+    'Compound words',
+    'German writes a compound as one word. die Haustür, der Bahnhof, and das Klassenzimmer are each one noun. The last noun decides the gender: die Tür gives die Haustür, and das Zimmer gives das Klassenzimmer.',
+  ),
+]
+
+const texts = [
+  stub(
+    'text-notice',
+    'Reading a notice',
+    'Read a notice for the place, the date, and the time before you read the extra sentences. A verb such as ändern, ausfallen, or mitbringen often carries the news. If two times appear, match each time to its own day. Answer from that line.',
+  ),
+  stub(
+    'text-idea',
+    'The main idea',
+    'The main idea is the point the whole text supports, often in the first or the last sentence. An example, a price, or a name is a detail. Ask what the writer wants the reader to do or to believe. If you can delete a sentence and the point remains, that sentence was a detail.',
+  ),
+  stub(
+    'text-true-false',
+    'True or false',
+    'A statement is false when one word fights the text, such as nicht, nur, immer, or alle. Check that word before you choose Richtig. Do not bring in facts from outside the paragraph. If the text does not say it, do not mark the statement as true.',
+  ),
+  stub(
+    'text-summary',
+    'One-sentence summary',
+    'A summary names the topic and the point, and it leaves out the example. Keep the conjugated verb in second position. One sentence is enough. Der Kurs fällt am Freitag aus, weil die Lehrerin krank ist.',
+  ),
+]
+
+const writing = [
+  stub(
+    'write-email',
+    'A short email',
+    'A short email greets the person, says why you are writing, makes one request, and closes with your name. Hallo Lena, is enough for a classmate. Close with Viele Grüße. Keep the conjugated verb in second position in each statement.',
+  ),
+  stub(
+    'write-describe',
+    'A description',
+    'Say what the thing is, then where it is, then one or two details. Das Zimmer ist klein. Es liegt neben der Küche. If you start with the place, the verb stays second: Neben der Küche liegt ein kleines Zimmer.',
+  ),
+  stub(
+    'write-reason',
+    'Giving a reason',
+    'Give one reason. weil sends the conjugated verb to the end: Ich bleibe hier, weil ich krank bin. denn keeps normal order: Ich bleibe hier, denn ich bin krank. Do not put the verb second after weil.',
+  ),
+  stub(
+    'write-open',
+    'Openings and closings',
+    'Sehr geehrte Frau Berg, is formal, and Hallo Frau Berg, is milder. For a friend, use Hallo and the first name. Close a formal note with Mit freundlichen Grüßen. Close a friendly note with Viele Grüße or Liebe Grüße, then your name on the next line.',
+  ),
+]
+
+const pronunciation = [
+  stub(
+    'say-umlaut',
+    'ä, ö, and ü',
+    'ä, ö, and ü are their own vowels. Short ä is close to the vowel in the English word bed, as in Männer. For ö, round your lips and say e, as in schön. For ü, round your lips and say i, as in Tür.',
+  ),
+  stub(
+    'say-ch',
+    'The two ch sounds',
+    'After a, o, u, or au, ch is the sound in Bach, doch, and Buch. After i, e, ä, ö, ü, l, n, or r, it is the softer sound in ich, mich, and Milch. The vowel before ch chooses the sound. Do not say ich with a k.',
+  ),
+  stub(
+    'say-r',
+    'r',
+    'At the start of a syllable, r is clear: rot, Regen, warum. After a vowel, many speakers make r very weak, almost like a short a: der, Mutter, wird. Both are understood. The vowel before that weak r is still long or short as the spelling says.',
+  ),
+  stub(
+    'say-stress',
+    'Word stress',
+    'Most German words stress the first syllable: Vater, arbeiten, Schule. The prefixes be-, ge-, er-, ver-, zer-, ent-, and emp- are unstressed: verkaufen, bekommen. A separable prefix is stressed: aufstehen, einkaufen, anrufen.',
+  ),
+  stub(
+    'say-final',
+    'b, d, and g at the end',
+    'At the end of a syllable, b, d, and g lose their voice. Tag sounds like Tak, Hund like Hunt, and gelb like gelp. The spelling keeps b, d, and g. Tag still has a long a; only the final sound is voiceless.',
+  ),
+]
+
+export const courseGroups = [
+  {
+    id: 'grammar',
+    title: 'Grammar',
+    blurb: 'The forms a sentence needs, from the article through the Perfekt.',
+    lessons: grammar,
+  },
+  {
+    id: 'vocabulary',
+    title: 'Vocabulary',
+    blurb: 'Short lists written for this class. The article is part of the word.',
+    lessons: vocabulary,
+  },
+  {
+    id: 'spelling',
+    title: 'Spelling',
+    blurb: 'How the written word shows a sound, a noun, or a break.',
+    lessons: spelling,
+  },
+  {
+    id: 'texts',
+    title: 'Working with texts',
+    blurb: 'What to look for before you answer a question about a short text.',
+    lessons: texts,
+  },
+  {
+    id: 'writing',
+    title: 'Writing',
+    blurb: 'Small patterns for a note, a reason, and an email.',
+    lessons: writing,
+  },
+  {
+    id: 'pronunciation',
+    title: 'Pronunciation',
+    blurb: 'Sounds and stress that change a word if you skip them.',
+    lessons: pronunciation,
+  },
+]
