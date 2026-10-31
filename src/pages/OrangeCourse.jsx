@@ -1,6 +1,38 @@
 import { useState } from 'react'
 import { courseGroups, studyOrder } from '../data/orangeCourse.js'
 
+function tidy(value) {
+  return value.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[.!?]+$/g, '')
+}
+
+function Check({ item }) {
+  const [value, setValue] = useState('')
+  const [state, setState] = useState('')
+
+  function tryAnswer(event) {
+    event.preventDefault()
+    setState(tidy(value) === tidy(item.a) ? 'right' : 'wrong')
+  }
+
+  return (
+    <form className="course-check" onSubmit={tryAnswer}>
+      <label>
+        {item.q}
+        <input value={value} onChange={(event) => setValue(event.target.value)} />
+      </label>
+      <button type="submit" className="btn">
+        Check
+      </button>
+      {state === 'right' ? <p className="check-right">Right.</p> : null}
+      {state === 'wrong' ? (
+        <p className="check-wrong">
+          Not quite. <strong>{item.a}</strong>
+        </p>
+      ) : null}
+    </form>
+  )
+}
+
 function LessonTable({ table }) {
   return (
     <div className="table-wrap">
@@ -38,6 +70,7 @@ function LessonBlock({ lesson }) {
               <tr>
                 <th>Deutsch</th>
                 <th>English</th>
+                {lesson.words.some((pair) => pair[2]) ? <th>Try</th> : null}
               </tr>
             </thead>
             <tbody>
@@ -45,11 +78,19 @@ function LessonBlock({ lesson }) {
                 <tr key={pair[0]}>
                   <td lang="de">{pair[0]}</td>
                   <td>{pair[1]}</td>
+                  {pair[2] ? <td lang="de">{pair[2]}</td> : null}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        {lesson.line ? (
+          <p>
+            <span lang="de">{lesson.line.de}</span>
+            {' — '}
+            {lesson.line.en}
+          </p>
+        ) : null}
       </article>
     )
   }
@@ -79,12 +120,7 @@ function LessonBlock({ lesson }) {
         <strong>Check yourself</strong>
       </p>
       {lesson.checks.map((item) => (
-        <details key={item.q}>
-          <summary>{item.q}</summary>
-          <p>
-            <strong>{item.a}</strong>
-          </p>
-        </details>
+        <Check key={item.q} item={item} />
       ))}
     </article>
   )

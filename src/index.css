@@ -486,6 +486,44 @@ textarea {
   border-bottom: 0;
 }
 
+.comment-photo {
+  display: block;
+  width: 160px;
+  height: 160px;
+  margin: 8px 0;
+  object-fit: cover;
+  object-position: center;
+  background: #161410;
+  border: 1px solid var(--line);
+}
+
+.course-check {
+  margin: 0 0 14px;
+}
+
+.course-check label {
+  display: block;
+}
+
+.course-check input {
+  display: block;
+  width: min(100%, 420px);
+  margin: 4px 0 8px;
+  padding: 8px 10px;
+  color: var(--ink);
+  background: #161410;
+  border: 1px solid #534c44;
+  font: 16px Tahoma, Verdana, Geneva, sans-serif;
+}
+
+.check-right {
+  color: #8fd18a;
+}
+
+.check-wrong {
+  color: #f0a39c;
+}
+
 .auth-form {
   max-width: 420px;
 }
