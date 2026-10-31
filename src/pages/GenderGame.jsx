@@ -13,9 +13,10 @@ function withChoices(card, seed) {
 
 function readResult(result) {
   if (result && typeof result === 'object') {
-    return { correct: Boolean(result.correct), picked: result.picked || '' }
+    const skipped = Boolean(result.skipped)
+    return { correct: skipped ? false : Boolean(result.correct), picked: result.picked || '', skipped }
   }
-  return { correct: Boolean(result), picked: '' }
+  return { correct: Boolean(result), picked: '', skipped: false }
 }
 
 function dealPractice(caseId, avoidId) {
@@ -70,9 +71,11 @@ export default function GenderGame() {
           id: item.id,
           kicker: `${caseLabel} · ${source.numberLabel}`,
           prompt: source.form,
-          picked: item.picked || (item.correct ? source.answer : '—'),
+          picked: item.skipped ? 'Unsure' : item.picked || (item.correct ? source.answer : '—'),
           answer: source.answer,
-          correct: Boolean(item.correct),
+          correct: Boolean(item.correct) && !item.skipped,
+          skipped: Boolean(item.skipped),
+          translation: source.en,
         }
       })
       .filter(Boolean)
@@ -94,19 +97,23 @@ export default function GenderGame() {
   const onLastDaily = mode === 'daily' && Boolean(card) && unanswered.length === 0
 
   function onAnswered(result) {
-    const { correct, picked } = readResult(result)
+    const { correct, picked, skipped } = readResult(result)
     if (mode === 'practice') {
       if (!card) return
-      setSession((prev) => ({ seen: prev.seen + 1, correct: prev.correct + (correct ? 1 : 0) }))
+      if (!skipped) {
+        setSession((prev) => ({ seen: prev.seen + 1, correct: prev.correct + (correct ? 1 : 0) }))
+      }
       setRound((prev) => [
         ...prev,
         {
           id: `${card.id}-${prev.length}`,
           kicker: `${caseLabel} · ${card.numberLabel}`,
           prompt: card.form,
-          picked,
+          picked: skipped ? 'Unsure' : picked,
           answer: card.answer,
-          correct,
+          correct: skipped ? false : correct,
+          skipped,
+          translation: card.en,
         },
       ])
       return
@@ -115,14 +122,14 @@ export default function GenderGame() {
     setHoldId(card.id)
     setProgress((prev) => {
       if (prev.answers.some((item) => item.id === card.id)) return prev
-      const next = { answers: [...prev.answers, { id: card.id, correct, picked }] }
+      const next = { answers: [...prev.answers, { id: card.id, correct, picked: skipped ? 'Unsure' : picked, skipped }] }
       writeDailyProgress(progressKey, next)
       return next
     })
   }
 
-  function onNext() {
-    primeAudio()
+  function onNext(silent) {
+    if (!silent) primeAudio()
     if (mode === 'practice') {
       setPracticeCard(dealPractice(caseId, card?.id))
       return
@@ -202,10 +209,10 @@ export default function GenderGame() {
         <>
           {mode === 'daily' ? (
             <p className="hint">
-              Today&apos;s {caseLabel} set is done. {dailyCorrect} of {DAILY_COUNT} correct.
+              Today&apos;s {caseLabel} set is done. {dailyCorrect} correct.
             </p>
           ) : (
-            <p className="hint">This round: {round.filter((item) => item.correct).length} correct of {round.length}.</p>
+            <p className="hint">This round: {session.correct} correct out of {session.seen}.</p>
           )}
           <RoundReview
             key={slides.map((item) => item.id).join('|')}
@@ -227,7 +234,7 @@ export default function GenderGame() {
               key={`${mode}-${caseId}-${card.id}`}
               kicker={`${caseLabel} · ${card.numberLabel}`}
               prompt={card.form}
-              hint={card.en}
+              translation={card.en}
               choices={card.choices}
               answer={card.answer}
               nextLabel={mode === 'daily' ? (onLastDaily ? 'End' : 'Next') : 'New card'}

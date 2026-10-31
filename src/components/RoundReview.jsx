@@ -24,7 +24,7 @@ export default function RoundReview({ slides, onNewRound }) {
 
   if (!slide) return null
 
-  const tone = slide.correct ? 'is-right' : 'is-wrong'
+  const tone = slide.skipped ? 'is-skipped' : slide.correct ? 'is-right' : 'is-wrong'
 
   return (
     <section className={`flash review-slide ${tone}`} aria-label="Review">
@@ -35,12 +35,27 @@ export default function RoundReview({ slides, onNewRound }) {
       <p className="flash-word" lang="de">
         {slide.prompt}
       </p>
-      <p className="review-line">
-        Your answer: <strong lang="de">{slide.picked}</strong>
-      </p>
-      <p className="review-line">
-        Right answer: <strong lang="de">{slide.answer}</strong>
-      </p>
+      {slide.skipped ? (
+        <>
+          <p className="review-line">Skipped</p>
+          <p className="review-line">
+            Your action: <strong>Unsure</strong>
+          </p>
+          <p className="review-line">
+            Right answer: <strong lang="de">{slide.answer}</strong>
+          </p>
+          {slide.translation ? <p className="review-line review-translation">Translation: {slide.translation}</p> : null}
+        </>
+      ) : (
+        <>
+          <p className="review-line">
+            Your answer: <strong lang="de">{slide.picked}</strong>
+          </p>
+          <p className="review-line">
+            Right answer: <strong lang="de">{slide.answer}</strong>
+          </p>
+        </>
+      )}
       <div className="review-nav">
         <button
           type="button"

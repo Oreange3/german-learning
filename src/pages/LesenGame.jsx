@@ -11,9 +11,14 @@ function progressKey(level) {
 
 function readResult(result) {
   if (result && typeof result === 'object') {
-    return { correct: Boolean(result.correct), picked: result.picked || '' }
+    const skipped = Boolean(result.skipped)
+    return { correct: skipped ? false : Boolean(result.correct), picked: result.picked || '', skipped }
   }
-  return { correct: Boolean(result), picked: '' }
+  return { correct: Boolean(result), picked: '', skipped: false }
+}
+
+function readingTranslation(passage, question) {
+  return [passage?.en, question?.en].filter(Boolean).join('\n\n')
 }
 
 function dealPractice(level) {
@@ -82,9 +87,11 @@ export default function LesenGame() {
           id: item.id,
           kicker: dailyText.title,
           prompt: source.prompt,
-          picked: item.picked || (item.correct ? source.answer : '—'),
+          picked: item.skipped ? 'Unsure' : item.picked || (item.correct ? source.answer : '—'),
           answer: source.answer,
-          correct: Boolean(item.correct),
+          correct: Boolean(item.correct) && !item.skipped,
+          skipped: Boolean(item.skipped),
+          translation: readingTranslation(dailyText, source),
         }
       })
       .filter(Boolean)
@@ -107,19 +114,23 @@ export default function LesenGame() {
   const onLastDaily = mode === 'daily' && Boolean(question) && unanswered.length === 0
 
   function onAnswered(result) {
-    const { correct, picked } = readResult(result)
+    const { correct, picked, skipped } = readResult(result)
     if (mode === 'practice') {
       if (!question || !text) return
-      setSession((prev) => ({ seen: prev.seen + 1, correct: prev.correct + (correct ? 1 : 0) }))
+      if (!skipped) {
+        setSession((prev) => ({ seen: prev.seen + 1, correct: prev.correct + (correct ? 1 : 0) }))
+      }
       setRound((prev) => [
         ...prev,
         {
           id: `${question.id}-${prev.length}`,
           kicker: text.title,
           prompt: question.prompt,
-          picked,
+          picked: skipped ? 'Unsure' : picked,
           answer: question.answer,
-          correct,
+          correct: skipped ? false : correct,
+          skipped,
+          translation: readingTranslation(text, question),
         },
       ])
       return
@@ -128,14 +139,16 @@ export default function LesenGame() {
     setHoldId(question.id)
     setProgress((prev) => {
       if (prev.answers.some((item) => item.id === question.id)) return prev
-      const next = { answers: [...prev.answers, { id: question.id, correct, picked }] }
+      const next = {
+        answers: [...prev.answers, { id: question.id, correct, picked: skipped ? 'Unsure' : picked, skipped }],
+      }
       writeDailyProgress(key, next)
       return next
     })
   }
 
-  function onNext() {
-    primeAudio()
+  function onNext(silent) {
+    if (!silent) primeAudio()
     if (mode === 'practice') {
       setPractice(nextPractice(level, practice))
       return
@@ -212,10 +225,10 @@ export default function LesenGame() {
         <>
           {mode === 'daily' ? (
             <p className="hint">
-              Today&apos;s {level} text is done. {dailyCorrect} of {dailyText.questions.length} correct.
+              Today&apos;s {level} text is done. {dailyCorrect} correct.
             </p>
           ) : (
-            <p className="hint">This round: {round.filter((item) => item.correct).length} correct of {round.length}.</p>
+            <p className="hint">This round: {session.correct} correct out of {session.seen}.</p>
           )}
           <RoundReview
             key={slides.map((item) => item.id).join('|')}
@@ -243,6 +256,7 @@ export default function LesenGame() {
               key={`${mode}-${level}-${question.id}`}
               kicker="Question"
               prompt={question.prompt}
+              translation={readingTranslation(text, question)}
               choices={question.choices}
               answer={question.answer}
               nextLabel={mode === 'daily' ? (onLastDaily ? 'End' : 'Next question') : 'Next'}
