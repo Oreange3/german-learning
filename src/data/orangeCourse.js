@@ -37,7 +37,7 @@ function check(q, a) {
 export const studyOrder = [
   'Learn noun gender, then plurals, and say the article with every new noun.',
   'Learn the present tense, then the short note on sein and haben.',
-  'Learn main-clause word order before you write your own sentences.',
+  'Learn main-clause word order, then TeKaMoLo, before you write your own sentences.',
   'Learn the four cases. Use nominative and accusative first, then dative and genitive.',
   'Learn personal pronouns in those cases, then negation.',
   'Learn modal verbs and separable verbs.',
@@ -314,6 +314,27 @@ const grammar = [
       ex('Im Park spielt das Kind.', 'The child is playing in the park.'),
     ],
     [check('Morgen ___ ich früh auf. (aufstehen)', 'stehe'), check('How do you fix Morgen ich gehe zur Schule?', 'Morgen gehe ich zur Schule.')],
+  ),
+  full(
+    'tekamolo',
+    'TeKaMoLo',
+    'Extra pieces in the middle of a sentence usually line up as time, reason, manner, place. The short name is TeKaMoLo. The longer treatment is in the study lab, under Sentence structure.',
+    ['Letter', 'Asks', 'Example'],
+    [
+      ['Te', 'when?', 'morgen'],
+      ['Ka', 'why?', 'wegen des Streiks'],
+      ['Mo', 'how?', 'mit dem Bus'],
+      ['Lo', 'where?', 'nach Berlin'],
+    ],
+    [
+      ex('Ich fahre morgen wegen des Streiks mit dem Bus nach Berlin.', 'I am going to Berlin by bus tomorrow because of the strike.'),
+      ex('Morgen fahre ich wegen des Streiks mit dem Bus nach Berlin.', 'Tomorrow takes position 1, so the verb follows it. The other three stay in order.'),
+      ex('Ich lerne abends in der Bibliothek.', 'I study in the library in the evenings. Time, then place. You do not need all four letters.'),
+    ],
+    [
+      check('Order the middle: nach Berlin / morgen / mit dem Bus. Ich fahre …', 'morgen mit dem Bus nach Berlin'),
+      check('Morgen is position 1. Morgen ___ ich nach Berlin. (fahren)', 'fahre'),
+    ],
   ),
   full(
     'conjunctions',
