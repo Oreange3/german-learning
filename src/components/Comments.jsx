@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { compressImageFile, compressImageSource } from '../lib/compressImage.js'
+import { currentIdentity } from '../lib/identity.js'
 
 const STORAGE_KEY = 'goc_comments'
 const MAX_COMMENTS = 40
@@ -27,18 +28,12 @@ function newId() {
 
 export default function Comments() {
   const { user } = useAuth()
+  const identity = currentIdentity(user?.username)
   const [comments, setComments] = useState(readComments)
-  const [name, setName] = useState(() => user?.username || '')
   const [text, setText] = useState('')
   const [photo, setPhoto] = useState('')
   const [error, setError] = useState('')
   const fileRef = useRef(null)
-
-  useEffect(() => {
-    if (user?.username) {
-      setName((prev) => prev || user.username)
-    }
-  }, [user])
 
   useEffect(() => {
     let cancel = false
@@ -108,16 +103,16 @@ export default function Comments() {
 
   function handleSubmit(event) {
     event.preventDefault()
-    const author = name.trim()
     const body = text.trim()
-    if (!author || (!body && !photo)) {
-      setError('Write a name, and a comment or a picture.')
+    if (!body && !photo) {
+      setError('Write a comment or add a picture.')
       return
     }
     setError('')
     const entry = {
       id: newId(),
-      name: author.slice(0, 40),
+      name: identity.label,
+      authorKey: identity.key,
       text: body.slice(0, 500),
       at: Date.now(),
     }
@@ -135,12 +130,11 @@ export default function Comments() {
   return (
     <section className="panel" aria-labelledby="comments-title">
       <h2 id="comments-title">Comments</h2>
-      <p>Notes from anyone on this computer. They stay in this browser. A picture is always saved as a 128×128 square from the middle.</p>
+      <p>They stay in this browser. A picture is always saved as a 128×128 square from the middle.</p>
+      <p className="hint">
+        Posting as <strong>{identity.label}</strong>. That name cannot be changed.
+      </p>
       <form className="auth-form" onSubmit={handleSubmit}>
-        <label>
-          Name
-          <input value={name} onChange={(event) => setName(event.target.value)} maxLength={40} />
-        </label>
         <label>
           Comment
           <input value={text} onChange={(event) => setText(event.target.value)} maxLength={500} />
