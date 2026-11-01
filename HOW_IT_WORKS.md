@@ -136,7 +136,7 @@ Clearing site data wipes accounts, notes, and ticks.
 
 ### Image shrink for notes
 
-Notes store pictures as JPEG data URLs. `FileReader` → `Image` → `<canvas>` scaled so the long edge is at most 900 px, quality 0.72, max 6 images per note. That keeps localStorage from exploding.
+Notes and comments store pictures as JPEG data URLs. Each picture is center-cropped and drawn to a 128×128 canvas, quality 0.82. Notes allow 6 pictures. Old larger pictures are rewritten to 128×128 the next time that page opens.
 
 ### Guest vs member
 

@@ -1,8 +1,7 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { compressImageFile, compressImageSource } from '../lib/compressImage.js'
 
 const MAX_IMAGES = 6
-const MAX_IMAGE_EDGE = 900
-const IMAGE_QUALITY = 0.72
 const SHARED_KEY = 'hallodeutsch_notes'
 const LEGACY_PREFIX = 'hallodeutsch_notes_'
 
@@ -57,33 +56,6 @@ function previewText(body) {
   return text.length > 140 ? `${text.slice(0, 140)}…` : text
 }
 
-function readImage(file) {
-  return new Promise((resolve, reject) => {
-    if (!file?.type?.startsWith('image/')) {
-      reject(new Error('Pick a picture file (jpg, png, gif, webp).'))
-      return
-    }
-
-    const reader = new FileReader()
-    reader.onerror = () => reject(new Error('Could not read that file.'))
-    reader.onload = () => {
-      const img = new Image()
-      img.onerror = () => reject(new Error('That picture would not load.'))
-      img.onload = () => {
-        const scale = Math.min(1, MAX_IMAGE_EDGE / Math.max(img.width, img.height))
-        const canvas = document.createElement('canvas')
-        canvas.width = Math.max(1, Math.round(img.width * scale))
-        canvas.height = Math.max(1, Math.round(img.height * scale))
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-        resolve(canvas.toDataURL('image/jpeg', IMAGE_QUALITY))
-      }
-      img.src = reader.result
-    }
-    reader.readAsDataURL(file)
-  })
-}
-
 function emptyDraft() {
   return { title: '', body: '', images: [] }
 }
@@ -101,6 +73,40 @@ export default function Notes() {
   const [draft, setDraft] = useState(emptyDraft)
   const [error, setError] = useState('')
   const [busyImage, setBusyImage] = useState(false)
+
+  useEffect(() => {
+    let cancel = false
+    ;(async () => {
+      const current = loadNotes(SHARED_KEY)
+      let changed = false
+      const next = []
+      for (const note of current) {
+        const images = Array.isArray(note.images) ? note.images : []
+        const shrunk = []
+        let noteChanged = false
+        for (const src of images) {
+          try {
+            const out = await compressImageSource(src)
+            if (out !== src) noteChanged = true
+            shrunk.push(out)
+          } catch {
+            shrunk.push(src)
+          }
+        }
+        if (noteChanged) {
+          changed = true
+          next.push({ ...note, images: shrunk })
+        } else {
+          next.push(note)
+        }
+      }
+      if (cancel || !changed) return
+      if (saveNotes(SHARED_KEY, next)) setNotes(next)
+    })()
+    return () => {
+      cancel = true
+    }
+  }, [])
 
   function persist(next) {
     const ok = saveNotes(SHARED_KEY, next)
@@ -143,7 +149,7 @@ export default function Notes() {
     setBusyImage(true)
     setError('')
     try {
-      const dataUrl = await readImage(file)
+      const dataUrl = await compressImageFile(file)
       setDraft((current) => ({ ...current, images: [...current.images, dataUrl] }))
     } catch (err) {
       setError(err.message || 'Could not add that picture.')
@@ -216,8 +222,8 @@ export default function Notes() {
           login wall and nothing is stored in the cloud. Notes stay in this browser only.
         </p>
         <p className="hint">
-          Press + for a new note. Title and words are the main thing. Pictures are optional — they
-          are shrunk a bit so they fit in the browser.
+          Press + for a new note. Title and words are the main thing. Pictures are optional and
+          are always saved as a 128×128 square.
         </p>
       </section>
 

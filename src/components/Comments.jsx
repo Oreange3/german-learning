@@ -1,38 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { compressImageFile, compressImageSource } from '../lib/compressImage.js'
 
 const STORAGE_KEY = 'goc_comments'
 const MAX_COMMENTS = 40
-const PHOTO_SIZE = 280
-
-function cropCenterSquare(file) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file)
-    const img = new Image()
-    img.onload = () => {
-      const side = Math.min(img.naturalWidth, img.naturalHeight)
-      if (!side) {
-        URL.revokeObjectURL(url)
-        reject(new Error('empty'))
-        return
-      }
-      const sx = Math.floor((img.naturalWidth - side) / 2)
-      const sy = Math.floor((img.naturalHeight - side) / 2)
-      const canvas = document.createElement('canvas')
-      canvas.width = PHOTO_SIZE
-      canvas.height = PHOTO_SIZE
-      const ctx = canvas.getContext('2d')
-      ctx.drawImage(img, sx, sy, side, side, 0, 0, PHOTO_SIZE, PHOTO_SIZE)
-      URL.revokeObjectURL(url)
-      resolve(canvas.toDataURL('image/jpeg', 0.82))
-    }
-    img.onerror = () => {
-      URL.revokeObjectURL(url)
-      reject(new Error('image'))
-    }
-    img.src = url
-  })
-}
 
 function readComments() {
   try {
@@ -69,6 +40,42 @@ export default function Comments() {
     }
   }, [user])
 
+  useEffect(() => {
+    let cancel = false
+    ;(async () => {
+      const current = readComments()
+      let changed = false
+      const next = []
+      for (const item of current) {
+        if (typeof item.image !== 'string') {
+          next.push(item)
+          continue
+        }
+        try {
+          const image = await compressImageSource(item.image)
+          if (image !== item.image) {
+            changed = true
+            next.push({ ...item, image })
+          } else {
+            next.push(item)
+          }
+        } catch {
+          next.push(item)
+        }
+      }
+      if (cancel || !changed) return
+      setComments(next)
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      } catch {
+        setError('This browser could not save the comment.')
+      }
+    })()
+    return () => {
+      cancel = true
+    }
+  }, [])
+
   function publish(next) {
     setComments(next)
     try {
@@ -90,7 +97,7 @@ export default function Comments() {
       return
     }
     try {
-      setPhoto(await cropCenterSquare(file))
+      setPhoto(await compressImageFile(file))
       setError('')
     } catch {
       setPhoto('')
@@ -128,7 +135,7 @@ export default function Comments() {
   return (
     <section className="panel" aria-labelledby="comments-title">
       <h2 id="comments-title">Comments</h2>
-      <p>Notes from anyone on this computer. They stay in this browser. A picture is cropped to the square in the middle.</p>
+      <p>Notes from anyone on this computer. They stay in this browser. A picture is always saved as a 128×128 square from the middle.</p>
       <form className="auth-form" onSubmit={handleSubmit}>
         <label>
           Name
