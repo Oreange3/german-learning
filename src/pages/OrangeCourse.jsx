@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ArticleChart from '../components/ArticleChart.jsx'
 import { courseGroups, studyOrder } from '../data/orangeCourse.js'
 
 function tidy(value) {
@@ -36,6 +37,7 @@ function Check({ item }) {
 function LessonTable({ table }) {
   return (
     <div className="table-wrap">
+      {table.caption ? <p className="hint">{table.caption}</p> : null}
       <table className="grid-table">
         <thead>
           <tr>
@@ -113,7 +115,15 @@ function LessonBlock({ lesson }) {
   return (
     <>
       <p>{lesson.idea}</p>
+      {lesson.chart ? <ArticleChart /> : null}
+      {lesson.notes?.map((note) => (
+        <p key={note}>{note}</p>
+      ))}
+      {lesson.source ? <p className="hint">{lesson.source}</p> : null}
       <LessonTable table={lesson.table} />
+      {lesson.moreTables?.map((table) => (
+        <LessonTable key={table.caption || table.headers.join('|')} table={table} />
+      ))}
       {lesson.examples.map((example) => (
         <p key={example.de}>
           <span lang="de">{example.de}</span>

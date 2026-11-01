@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import ArticleChart from '../components/ArticleChart.jsx'
 import FlashCard from '../components/FlashCard.jsx'
 import RoundReview from '../components/RoundReview.jsx'
 import { allGenderCards, CASES } from '../data/genderNouns.js'
@@ -166,8 +167,9 @@ export default function GenderGame() {
       <h2>Daily gender</h2>
       <p>
         The gap is the article. The words around it show the case: Hier ist or Hier sind, für or ohne,
-        von (from the …) or zu (to the …), wegen or trotz.
+        von (from the …) or zu (to the …), wegen or trotz. The article chart is the same grid for every noun.
       </p>
+      <ArticleChart withNotes />
       <div className="mode-row" role="group" aria-label="Play mode">
         <button
           type="button"

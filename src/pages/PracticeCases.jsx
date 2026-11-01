@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import ArticleChart from '../components/ArticleChart.jsx'
 import FillTable from '../components/FillTable.jsx'
 import { casePracticeDrills } from '../data/cases.js'
 
@@ -11,8 +12,10 @@ export default function PracticeCases() {
       <h2>Case tables</h2>
       <p>
         Fill he / she / it / they, then his / her, then that. These are the same blanks as in the
-        Cases lessons. Check, show answers, clear, and do them again.
+        Cases lessons. Check, show answers, clear, and do them again. Open the article chart if you
+        want the picture while you fill them.
       </p>
+      <ArticleChart />
       <p>
         <Link className="btn btn-gold" to="/study/cases-pronouns">
           Open the pronoun lesson

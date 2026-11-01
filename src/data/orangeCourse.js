@@ -4,8 +4,22 @@
  * The wording, tables, examples, and lists were written here.
  */
 
-function full(id, title, idea, headers, rows, examples, checks) {
-  return { id, title, kind: 'full', idea, table: { headers, rows }, examples, checks }
+import { caseNotes, chartSource } from './caseNotes.js'
+
+function full(id, title, idea, headers, rows, examples, checks, extra = {}) {
+  return {
+    id,
+    title,
+    kind: 'full',
+    idea,
+    table: { caption: extra.tableCaption, headers, rows },
+    moreTables: extra.moreTables,
+    notes: extra.notes,
+    source: extra.source,
+    chart: extra.chart,
+    examples,
+    checks,
+  }
 }
 
 function words(id, title, list, line) {
@@ -23,7 +37,7 @@ function check(q, a) {
 export const studyOrder = [
   'Learn noun gender, then plurals, and say the article with every new noun.',
   'Learn the present tense, then the short note on sein and haben.',
-  'Learn main-clause word order before you write your own sentences.',
+  'Learn main-clause word order, then TeKaMoLo, before you write your own sentences.',
   'Learn the four cases. Use nominative and accusative first, then dative and genitive.',
   'Learn personal pronouns in those cases, then negation.',
   'Learn modal verbs and separable verbs.',
@@ -72,7 +86,7 @@ const grammar = [
   full(
     'cases',
     'The four cases',
-    'Case shows the job of a noun, and the definite article changes with the case.',
+    'Case is the job of a noun. The word in front of the noun changes to show that job. Press Article chart for the same grid as the picture.',
     ['Case', 'masculine', 'feminine', 'neuter', 'plural'],
     [
       ['Nominative', 'der', 'die', 'das', 'die'],
@@ -83,11 +97,36 @@ const grammar = [
     [
       ex('Der Mann gibt dem Kind den Apfel.', 'The man gives the child the apple.'),
       ex('Ich helfe den Kindern im Garten des Hauses.', 'I help the children in the garden of the house.'),
+      ex('Der Stein gehört meinem Onkel.', 'The stone belongs to my uncle. Der Stein is the subject.'),
+      ex('Ich möchte den Stein haben.', 'I would like to have the stone. den Stein is the direct object.'),
+      ex('Ich habe gerade von dem Stein gehört.', 'I just heard about the stone. von takes the dative.'),
+      ex('Das Gewicht des Steines ist zu viel für mich.', 'The weight of the stone is too much for me. des Steines is genitive, and it sits on another noun.'),
+      ex('Ein kleiner Mann hilft einem großen Kind.', 'ein has no ending, so kleiner shows the gender. einem already has the ending, so großen stays short.'),
     ],
     [
       check('Ich sehe ___ Hund. (the dog, direct object)', 'den'),
       check('Ich danke ___ Frau. (danken takes the dative)', 'der'),
+      check('Ich sehe ___ Kind. (a child; Kind is neuter)', 'ein'),
+      check('Ich habe von ___ Stein gehört. (the stone; von takes the dative)', 'dem'),
     ],
+    {
+      chart: true,
+      tableCaption: 'the — der, die, das',
+      notes: caseNotes,
+      source: chartSource,
+      moreTables: [
+        {
+          caption: 'ein-words — a, kein, mein, sein. Plural uses mein-, because ein has no plural.',
+          headers: ['Case', 'masculine', 'feminine', 'neuter', 'plural'],
+          rows: [
+            ['Nominative', 'ein', 'eine', 'ein', 'meine'],
+            ['Accusative', 'einen', 'eine', 'ein', 'meine'],
+            ['Dative', 'einem', 'einer', 'einem', 'meinen'],
+            ['Genitive', 'eines', 'einer', 'eines', 'meiner'],
+          ],
+        },
+      ],
+    },
   ),
   full(
     'personal-pronouns',
@@ -275,6 +314,27 @@ const grammar = [
       ex('Im Park spielt das Kind.', 'The child is playing in the park.'),
     ],
     [check('Morgen ___ ich früh auf. (aufstehen)', 'stehe'), check('How do you fix Morgen ich gehe zur Schule?', 'Morgen gehe ich zur Schule.')],
+  ),
+  full(
+    'tekamolo',
+    'TeKaMoLo',
+    'Extra pieces in the middle of a sentence usually line up as time, reason, manner, place. The short name is TeKaMoLo. The longer treatment is in the study lab, under Sentence structure.',
+    ['Letter', 'Asks', 'Example'],
+    [
+      ['Te', 'when?', 'morgen'],
+      ['Ka', 'why?', 'wegen des Streiks'],
+      ['Mo', 'how?', 'mit dem Bus'],
+      ['Lo', 'where?', 'nach Berlin'],
+    ],
+    [
+      ex('Ich fahre morgen wegen des Streiks mit dem Bus nach Berlin.', 'I am going to Berlin by bus tomorrow because of the strike.'),
+      ex('Morgen fahre ich wegen des Streiks mit dem Bus nach Berlin.', 'Tomorrow takes position 1, so the verb follows it. The other three stay in order.'),
+      ex('Ich lerne abends in der Bibliothek.', 'I study in the library in the evenings. Time, then place. You do not need all four letters.'),
+    ],
+    [
+      check('Order the middle: nach Berlin / morgen / mit dem Bus. Ich fahre …', 'morgen mit dem Bus nach Berlin'),
+      check('Morgen is position 1. Morgen ___ ich nach Berlin. (fahren)', 'fahre'),
+    ],
   ),
   full(
     'conjunctions',
