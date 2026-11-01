@@ -1,3 +1,5 @@
+import { caseNotes, chartSource } from './caseNotes.js'
+
 const b = (...answer) => ({ answer: answer.length === 1 ? answer[0] : answer })
 
 export const caseCategory = {
@@ -77,18 +79,19 @@ export const caseLessons = {
     category: 'cases',
     level: 'A1–A2',
     title: 'The four cases',
-    teaser: 'German nouns and pronouns change shape by job in the sentence.',
+    teaser: 'The job of a noun is its case. The noun usually stays put. The word in front of it changes.',
     wordIds: ['der', 'die', 'das', 'ich', 'er', 'sie'],
-    points: [
-      'A case is the job a noun or pronoun has: who does it, whom it hits, to whom it goes, whose it is.',
-      'Nominative answers wer? (who?). Accusative answers wen? (whom?). Dative answers wem? (to/for whom?). Genitive answers wessen? (whose?).',
-      'English mostly dropped this. German kept all four. Learn them as a set: articles, then pronouns, then possessives (his / her / their).',
-      'Spoken German often swaps genitive for von + dative (das Auto von dem Mann). Written German and exams still want the genitive.',
-    ],
+    points: caseNotes,
+    source: chartSource,
     examples: [
       { de: 'Der Mann sieht den Hund.', en: 'The man (nom.) sees the dog (acc.).' },
       { de: 'Er gibt ihr das Buch.', en: 'He (nom.) gives her (dat.) the book (acc.).' },
       { de: 'Das ist das Auto des Mannes.', en: 'That is the man’s car (gen.).' },
+      { de: 'Der Stein gehört meinem Onkel.', en: 'The stone belongs to my uncle. Der Stein is the subject.' },
+      { de: 'Ich möchte den Stein haben.', en: 'I would like to have the stone. den Stein is the direct object.' },
+      { de: 'Ich habe gerade von dem Stein gehört.', en: 'I just heard about the stone. von takes the dative.' },
+      { de: 'Das Gewicht des Steines ist zu viel für mich.', en: 'The weight of the stone is too much for me. des Steines is genitive.' },
+      { de: 'Ein kleiner Mann hilft einem großen Kind.', en: 'ein has no ending, so kleiner shows the gender. einem already has the ending, so großen stays short.' },
     ],
     tables: [
       {
@@ -99,6 +102,26 @@ export const caseLessons = {
           ['Accusative', 'wen? whom?', 'direct object', 'den'],
           ['Dative', 'wem? to whom?', 'indirect object', 'dem'],
           ['Genitive', 'wessen? whose?', 'possessor', 'des'],
+        ],
+      },
+      {
+        caption: 'the — der, die, das',
+        headers: ['Case', 'masc.', 'fem.', 'neut.', 'plural'],
+        rows: [
+          ['Nominative', 'der', 'die', 'das', 'die'],
+          ['Accusative', 'den', 'die', 'das', 'die'],
+          ['Dative', 'dem', 'der', 'dem', 'den'],
+          ['Genitive', 'des', 'der', 'des', 'der'],
+        ],
+      },
+      {
+        caption: 'ein-words — a, kein, mein, sein. Plural uses mein-, because ein has no plural.',
+        headers: ['Case', 'masc.', 'fem.', 'neut.', 'plural'],
+        rows: [
+          ['Nominative', 'ein', 'eine', 'ein', 'meine'],
+          ['Accusative', 'einen', 'eine', 'ein', 'meine'],
+          ['Dative', 'einem', 'einer', 'einem', 'meinen'],
+          ['Genitive', 'eines', 'einer', 'eines', 'meiner'],
         ],
       },
     ],

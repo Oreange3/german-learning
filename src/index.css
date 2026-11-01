@@ -387,6 +387,41 @@ textarea {
   padding: 0 14px 12px;
 }
 
+.chart-drop {
+  margin: 0 0 12px;
+}
+
+.chart-drop-panel {
+  margin-top: 2px;
+  padding: 12px;
+  max-width: 720px;
+  background: var(--paper);
+  color: var(--paper-ink);
+  border: 1px solid var(--gold-dark);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.chart-drop-panel img {
+  display: block;
+  width: min(100%, 500px);
+  height: auto;
+  background: #fff;
+}
+
+.chart-caption,
+.chart-note {
+  color: #3a342c;
+}
+
+.chart-caption {
+  margin: 10px 0 0;
+  font-size: 14px;
+}
+
+.chart-note {
+  margin: 10px 0 0;
+}
+
 .sidebar .panel:last-child,
 .content .panel:last-child {
   margin-bottom: 0;

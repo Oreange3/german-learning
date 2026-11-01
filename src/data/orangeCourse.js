@@ -4,8 +4,22 @@
  * The wording, tables, examples, and lists were written here.
  */
 
-function full(id, title, idea, headers, rows, examples, checks) {
-  return { id, title, kind: 'full', idea, table: { headers, rows }, examples, checks }
+import { caseNotes, chartSource } from './caseNotes.js'
+
+function full(id, title, idea, headers, rows, examples, checks, extra = {}) {
+  return {
+    id,
+    title,
+    kind: 'full',
+    idea,
+    table: { caption: extra.tableCaption, headers, rows },
+    moreTables: extra.moreTables,
+    notes: extra.notes,
+    source: extra.source,
+    chart: extra.chart,
+    examples,
+    checks,
+  }
 }
 
 function words(id, title, list, line) {
@@ -72,7 +86,7 @@ const grammar = [
   full(
     'cases',
     'The four cases',
-    'Case shows the job of a noun, and the definite article changes with the case.',
+    'Case is the job of a noun. The word in front of the noun changes to show that job. Press Article chart for the same grid as the picture.',
     ['Case', 'masculine', 'feminine', 'neuter', 'plural'],
     [
       ['Nominative', 'der', 'die', 'das', 'die'],
@@ -83,11 +97,36 @@ const grammar = [
     [
       ex('Der Mann gibt dem Kind den Apfel.', 'The man gives the child the apple.'),
       ex('Ich helfe den Kindern im Garten des Hauses.', 'I help the children in the garden of the house.'),
+      ex('Der Stein gehört meinem Onkel.', 'The stone belongs to my uncle. Der Stein is the subject.'),
+      ex('Ich möchte den Stein haben.', 'I would like to have the stone. den Stein is the direct object.'),
+      ex('Ich habe gerade von dem Stein gehört.', 'I just heard about the stone. von takes the dative.'),
+      ex('Das Gewicht des Steines ist zu viel für mich.', 'The weight of the stone is too much for me. des Steines is genitive, and it sits on another noun.'),
+      ex('Ein kleiner Mann hilft einem großen Kind.', 'ein has no ending, so kleiner shows the gender. einem already has the ending, so großen stays short.'),
     ],
     [
       check('Ich sehe ___ Hund. (the dog, direct object)', 'den'),
       check('Ich danke ___ Frau. (danken takes the dative)', 'der'),
+      check('Ich sehe ___ Kind. (a child; Kind is neuter)', 'ein'),
+      check('Ich habe von ___ Stein gehört. (the stone; von takes the dative)', 'dem'),
     ],
+    {
+      chart: true,
+      tableCaption: 'the — der, die, das',
+      notes: caseNotes,
+      source: chartSource,
+      moreTables: [
+        {
+          caption: 'ein-words — a, kein, mein, sein. Plural uses mein-, because ein has no plural.',
+          headers: ['Case', 'masculine', 'feminine', 'neuter', 'plural'],
+          rows: [
+            ['Nominative', 'ein', 'eine', 'ein', 'meine'],
+            ['Accusative', 'einen', 'eine', 'ein', 'meine'],
+            ['Dative', 'einem', 'einer', 'einem', 'meinen'],
+            ['Genitive', 'eines', 'einer', 'eines', 'meiner'],
+          ],
+        },
+      ],
+    },
   ),
   full(
     'personal-pronouns',
