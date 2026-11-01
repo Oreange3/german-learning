@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { useAuth } from '../context/AuthContext.jsx'
 import { compressImageFile, compressImageSource } from '../lib/compressImage.js'
+import { currentIdentity, loadProfiles, saveProfileImage } from '../lib/identity.js'
 
 const MAX_IMAGES = 6
 const SHARED_KEY = 'hallodeutsch_notes'
@@ -60,8 +62,16 @@ function emptyDraft() {
   return { title: '', body: '', images: [] }
 }
 
+function initialOf(label) {
+  const text = String(label || '').replace(/^#/, '').trim()
+  return (text[0] || '?').toUpperCase()
+}
+
 export default function Notes() {
+  const { user } = useAuth()
+  const identity = currentIdentity(user?.username)
   const fileRef = useRef(null)
+  const profileRef = useRef(null)
   const [notes, setNotes] = useState(() => {
     const shared = loadNotes(SHARED_KEY)
     if (shared.length) return shared
@@ -73,9 +83,13 @@ export default function Notes() {
   const [draft, setDraft] = useState(emptyDraft)
   const [error, setError] = useState('')
   const [busyImage, setBusyImage] = useState(false)
+  const [profiles, setProfiles] = useState(loadProfiles)
+  const [profileError, setProfileError] = useState('')
+  const [profileBusy, setProfileBusy] = useState(false)
 
   useEffect(() => {
     let cancel = false
+    const who = identity
     ;(async () => {
       const current = loadNotes(SHARED_KEY)
       let changed = false
@@ -93,9 +107,16 @@ export default function Notes() {
             shrunk.push(src)
           }
         }
+        let authorName = note.authorName
+        let authorKey = note.authorKey
+        if (typeof authorName !== 'string' || !authorName || typeof authorKey !== 'string' || !authorKey) {
+          authorName = who.label
+          authorKey = who.key
+          noteChanged = true
+        }
         if (noteChanged) {
           changed = true
-          next.push({ ...note, images: shrunk })
+          next.push({ ...note, images: shrunk, authorName, authorKey })
         } else {
           next.push(note)
         }
@@ -106,7 +127,7 @@ export default function Notes() {
     return () => {
       cancel = true
     }
-  }, [])
+  }, [identity.key, identity.label])
 
   function persist(next) {
     const ok = saveNotes(SHARED_KEY, next)
@@ -181,6 +202,8 @@ export default function Notes() {
         title,
         body,
         images,
+        authorName: identity.label,
+        authorKey: identity.key,
         createdAt: now,
         updatedAt: now,
       }
@@ -206,10 +229,86 @@ export default function Notes() {
     cancelEdit()
   }
 
+  async function onPickProfile(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    setProfileBusy(true)
+    setProfileError('')
+    try {
+      const image = await compressImageFile(file)
+      setProfiles(saveProfileImage(identity.key, image))
+    } catch (err) {
+      setProfileError(err.message || 'That picture could not be saved.')
+    } finally {
+      setProfileBusy(false)
+    }
+  }
+
+  function removeProfile() {
+    try {
+      setProfiles(saveProfileImage(identity.key, ''))
+      setProfileError('')
+    } catch {
+      setProfileError('This browser could not update the profile picture.')
+    }
+  }
+
   const isEditing = editingId !== null
+  const myPicture = profiles[identity.key]?.image || ''
+  const editingNote = notes.find((note) => note.id === editingId)
+  const writingAs = editingNote?.authorName || identity.label
 
   return (
     <>
+      <section className="panel">
+        <h2>Profile picture</h2>
+        <div className="profile-row">
+          {myPicture ? (
+            <img className="profile-pic" src={myPicture} alt="" />
+          ) : (
+            <span className="profile-pic profile-fallback" aria-hidden="true">
+              {initialOf(identity.label)}
+            </span>
+          )}
+          <div>
+            <p>
+              {identity.guest ? 'This browser is ' : 'Logged in as '}
+              <strong>{identity.label}</strong>
+            </p>
+            <p className="hint">
+              {identity.guest
+                ? 'No login, so new notes use this code. It stays in a cookie on this browser.'
+                : 'New notes use your login name.'}{' '}
+              The picture is saved as a 128×128 square.
+            </p>
+            {profileError ? <p className="form-error">{profileError}</p> : null}
+            <div className="form-actions">
+              <input
+                ref={profileRef}
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={onPickProfile}
+              />
+              <button
+                type="button"
+                className="btn"
+                disabled={profileBusy}
+                onClick={() => profileRef.current?.click()}
+              >
+                {profileBusy ? 'Saving picture…' : myPicture ? 'Change picture' : 'Add picture'}
+              </button>
+              {myPicture ? (
+                <button type="button" className="btn" onClick={removeProfile}>
+                  Remove
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="panel">
         <div className="notes-head">
           <h2>Notes</h2>
@@ -218,8 +317,8 @@ export default function Notes() {
           </button>
         </div>
         <p>
-          A shared scratch pad on this computer. Anyone using this PC can open Notes — there is no
-          login wall and nothing is stored in the cloud. Notes stay in this browser only.
+          A shared scratch pad on this computer. Nothing is stored in the cloud. Each note keeps
+          the name that wrote it.
         </p>
         <p className="hint">
           Press + for a new note. Title and words are the main thing. Pictures are optional and
@@ -230,6 +329,7 @@ export default function Notes() {
       {isEditing && (
         <section className="panel">
           <h3>{editingId === 'new' ? 'New note' : 'Edit note'}</h3>
+          <p className="hint">Writing as {writingAs}</p>
           {error ? <p className="form-error">{error}</p> : null}
           <label className="note-field">
             Title
@@ -306,8 +406,18 @@ export default function Notes() {
                   className={`note-card${editingId === note.id ? ' selected' : ''}`}
                   onClick={() => openNote(note)}
                 >
+                  <span className="note-author">
+                    {profiles[note.authorKey]?.image ? (
+                      <img src={profiles[note.authorKey].image} alt="" />
+                    ) : (
+                      <span className="profile-fallback" aria-hidden="true">
+                        {initialOf(note.authorName)}
+                      </span>
+                    )}
+                    <span>{note.authorName || 'Earlier'}</span>
+                  </span>
                   <strong>{note.title}</strong>
-                  <span className="note-preview">{previewText(note.body)}</span>
+                  <span className="note-preview">{previewText(note.body || '')}</span>
                   <span className="hint">
                     {formatWhen(note.updatedAt)}
                     {note.images?.length ? ` · ${note.images.length} picture${note.images.length === 1 ? '' : 's'}` : ''}

@@ -126,7 +126,7 @@ Article and translation decks copy the list and shuffle in place (`shuffle` in `
 | --- | --- | --- |
 | `hallodeutsch_users` | localStorage | Array of `{ id, username, passwordHash, createdAt }` |
 | `hallodeutsch_session` | localStorage | `{ id, username }` or missing = guest |
-| `hallodeutsch_notes` | localStorage | Shared notes on this PC |
+| `hallodeutsch_notes` | localStorage | Notes on this PC, each with `authorName` and `authorKey` |
 | `hallodeutsch_notes_*` | localStorage | Old per-user keys; Notes migrates them once |
 | `hallodeutsch_kurs_done` | localStorage | `{ [lessonId]: true }` course ticks |
 | `hallodeutsch_ready_a1` … `_b2` | localStorage | Ready-when checkboxes per CEFR map |
@@ -140,7 +140,7 @@ Notes and comments store pictures as JPEG data URLs. Each picture is center-crop
 
 ### Guest vs member
 
-The site is **not** locked. Guests see everything. An account only stores a name + password hash in this browser. Notes are **shared on the PC**, not per user.
+The site is **not** locked. Guests see everything. An account only stores a name in this browser. A guest note is signed with a short hash of a random id kept in the `goc_browser` cookie. A logged-in note uses the login name. Profile pictures live in `goc_profiles`, keyed by that same identity, and are 128×128.
 
 ### Accessibility leftovers
 
@@ -357,7 +357,7 @@ This is **not** secure against anyone with DevTools on the same PC. It is only a
 
 ### Notes
 
-Shared list. Create / edit / delete. Pictures optional. If `hallodeutsch_notes` is empty, the page merges any old `hallodeutsch_notes_*` keys once.
+Shared list. Create / edit / delete. Pictures optional. New notes store the login name, or the browser hash when nobody is logged in. If `hallodeutsch_notes` is empty, the page merges any old `hallodeutsch_notes_*` keys once. Notes with no author get the current name the next time the page opens.
 
 ---
 

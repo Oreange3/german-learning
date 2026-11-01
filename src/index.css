@@ -1093,6 +1093,45 @@ h3 .muted {
   color: #f6e2c4;
 }
 
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-pic {
+  width: 128px;
+  height: 128px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  background: #161410;
+}
+
+.profile-fallback {
+  display: grid;
+  place-items: center;
+  color: var(--orange);
+  font: bold 28px Tahoma, Verdana, Geneva, sans-serif;
+}
+
+.note-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+
+.note-author img,
+.note-author .profile-fallback {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  border: 1px solid var(--line);
+  background: #161410;
+}
+
 .notes-head {
   display: flex;
   align-items: flex-start;
