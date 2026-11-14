@@ -1,10 +1,262 @@
-/** One infinitive, five gaps. The form changes with the sentence. */
+/** One infinitive, then every form that verb has. The verb stays for the whole set. */
 
-function card(spec) {
+function bareInfinitive(de, particle) {
+  if (particle && de.startsWith(particle)) return de.slice(particle.length)
+  return de
+}
+
+function stemOf(ich) {
+  return ich.endsWith('e') ? ich.slice(0, -1) : ''
+}
+
+function extraE(stem) {
+  return /(?:t|d)$/.test(stem) || /(?:ffn|chn|gn|tm|kn)$/.test(stem)
+}
+
+function regularDu(ich) {
+  const stem = stemOf(ich)
+  if (!stem) return ''
+  return stem + (extraE(stem) ? 'est' : 'st')
+}
+
+function regularIhr(ich) {
+  const stem = stemOf(ich)
+  if (!stem) return ''
+  return stem + (extraE(stem) ? 'et' : 't')
+}
+
+function withPrefix(needs, prefixNote) {
+  if (!prefixNote || String(needs).includes('prefix')) return needs
+  return `${needs}${prefixNote}`
+}
+
+function shiftDe(sentence, subject) {
+  if (!sentence || !sentence.startsWith('Ich ')) return ''
+  return `${subject}${sentence.slice(3)}`
+}
+
+function shiftEn(sentence, subject) {
+  if (!sentence || !sentence.startsWith('I ')) return ''
+  return subject + sentence.slice(1)
+}
+
+function presentLine(spec, particle, prefixNote, id, subject, clock, answer, needs, extra, build) {
+  const ichEn = spec.ichEn || (spec.i ? `I ${spec.i} at ten.` : '')
+  const ichDe = spec.ichDe || (particle ? `Ich ___ um zehn ${particle}.` : 'Ich ___ um zehn.')
+  const enName = `${id}En`
+  const deName = `${id}De`
+  const englishSubject = { du: 'You', wir: 'We', ihr: 'You all', sie: 'They', er: 'He' }[id] || 'I'
+  let en = spec[enName]
+  if (!en && id === 'ich') en = ichEn
+  if (!en && id === 'er' && spec.he) en = `He ${spec.he} at noon.`
+  if (!en && id !== 'er') en = shiftEn(ichEn, englishSubject)
+  let de = spec[deName]
+  if (!de && id === 'ich') de = ichDe
+  if (!de && spec.ichDe && id !== 'ich') de = shiftDe(spec.ichDe, subject)
+  if (!de) de = particle ? `${subject} ___ ${clock} ${particle}.` : `${subject} ___ ${clock}.`
+  return {
+    id,
+    label: 'Present',
+    slot: `${id}, present`,
+    needs: withPrefix(needs, prefixNote),
+    extra,
+    build,
+    why: particle
+      ? `Present, ${id}. The prefix stays at the end of the sentence.`
+      : `Present. The verb agrees with ${id}.`,
+    en,
+    de,
+    answer,
+  }
+}
+
+const FORMS = {
+  essen: { du: 'isst', past: 'aß', pastHe: 'ate' },
+  trinken: { past: 'trank', pastHe: 'drank' },
+  schlafen: { du: 'schläfst', past: 'schlief', pastHe: 'slept' },
+  lesen: { du: 'liest', past: 'las', pastHe: 'read' },
+  schreiben: { past: 'schrieb', pastHe: 'wrote' },
+  sprechen: { du: 'sprichst', past: 'sprach', pastHe: 'spoke' },
+  sehen: { du: 'siehst', past: 'sah', pastEn: 'He saw the film at noon.', pastDe: 'Er ___ den Film um zwölf.' },
+  geben: { du: 'gibst', past: 'gab', pastEn: 'He gave the book at noon.', pastDe: 'Er ___ das Buch um zwölf.' },
+  nehmen: { du: 'nimmst', past: 'nahm', pastEn: 'He took the bus at noon.', pastDe: 'Er ___ den Bus um zwölf.' },
+  helfen: { du: 'hilfst', past: 'half', pastHe: 'helped' },
+  finden: { past: 'fand', pastEn: 'He found the key at noon.', pastDe: 'Er ___ den Schlüssel um zwölf.' },
+  treffen: { du: 'triffst', past: 'traf', pastEn: 'He met Anna at noon.', pastDe: 'Er ___ Anna um zwölf.' },
+  vergessen: { du: 'vergisst', past: 'vergaß', pastEn: 'He forgot the name.', pastDe: 'Er ___ den Namen.' },
+  verstehen: { past: 'verstand', pastEn: 'He understood the question.', pastDe: 'Er ___ die Frage.' },
+  fahren: { du: 'fährst', past: 'fuhr', pastHe: 'drove' },
+  laufen: { du: 'läufst', past: 'lief', pastHe: 'ran' },
+  schwimmen: { past: 'schwamm', pastHe: 'swam' },
+  gehen: { past: 'ging', pastHe: 'went' },
+  kommen: { past: 'kam', pastHe: 'came' },
+  bleiben: { past: 'blieb', pastHe: 'stayed' },
+  tragen: { du: 'trägst', past: 'trug', pastEn: 'He wore a coat.', pastDe: 'Er ___ einen Mantel.' },
+  waschen: { du: 'wäschst', past: 'wusch', pastHe: 'washed' },
+  schließen: { du: 'schließt', duNeeds: '-st', past: 'schloss', pastHe: 'closed' },
+  beginnen: { past: 'begann', pastHe: 'began' },
+  gewinnen: { past: 'gewann', pastHe: 'won' },
+  bringen: {
+    past: 'brachte',
+    pastEn: 'He brought the book at noon.',
+    pastDe: 'Er ___ das Buch um zwölf.',
+    pastNeeds: 'an irregular past',
+    pastBuild: 'brachte',
+  },
+  denken: {
+    i: 'think of you',
+    duEn: 'You think of me at ten.',
+    duDe: 'Du ___ um zehn an mich.',
+    ihrEn: 'You all think of me at ten.',
+    ihrDe: 'Ihr ___ um zehn an mich.',
+    past: 'dachte',
+    pastEn: 'He thought of you at noon.',
+    pastDe: 'Er ___ um zwölf an dich.',
+    pastNeeds: 'an irregular past',
+    pastBuild: 'dachte',
+  },
+  kennen: { past: 'kannte', pastEn: 'He knew Anna.', pastDe: 'Er ___ Anna.', pastNeeds: 'an irregular past', pastBuild: 'kannte' },
+  wissen: {
+    du: 'weißt',
+    duNeeds: 'an irregular form',
+    duBuild: 'weißt',
+    duExtra: 'wissen does not take -st.',
+    ihr: 'wisst',
+    ihrNeeds: 'an irregular form',
+    ihrBuild: 'wisst',
+    ihrExtra: 'wissen does not take -t.',
+    past: 'wusste',
+    pastEn: 'He knew the answer.',
+    pastDe: 'Er ___ die Antwort.',
+    pastNeeds: 'an irregular past',
+    pastBuild: 'wusste',
+  },
+  haben: {
+    du: 'hast',
+    duNeeds: 'an irregular form',
+    duBuild: 'hast',
+    duExtra: 'haben shortens.',
+    past: 'hatte',
+    pastEn: 'He had time at noon.',
+    pastDe: 'Er ___ um zwölf Zeit.',
+    pastNeeds: 'an irregular past',
+    pastBuild: 'hatte',
+  },
+  sein: {
+    du: 'bist',
+    duNeeds: 'an irregular form',
+    duBuild: 'bist',
+    duExtra: 'sein does not take -st.',
+    wir: 'sind',
+    wirNeeds: 'an irregular form',
+    wirBuild: 'sind',
+    ihr: 'seid',
+    ihrNeeds: 'an irregular form',
+    ihrBuild: 'seid',
+    ihrExtra: 'sein does not take -t.',
+    sie: 'sind',
+    duEn: 'You are at home at ten.',
+    wirEn: 'We are at home at ten.',
+    ihrEn: 'You all are at home at ten.',
+    sieEn: 'They are at home at ten.',
+    past: 'war',
+    pastEn: 'He was at home at noon.',
+    pastDe: 'Er ___ um zwölf zu Hause.',
+    pastNeeds: 'an irregular past',
+    pastBuild: 'war',
+  },
+  werden: {
+    du: 'wirst',
+    duNeeds: 'an irregular form',
+    duBuild: 'wirst',
+    duExtra: 'werden does not take -st.',
+    past: 'wurde',
+    pastEn: 'He got tired at noon.',
+    pastDe: 'Er ___ um zwölf müde.',
+    pastNeeds: 'an irregular past',
+    pastBuild: 'wurde',
+  },
+  heißen: {
+    duEn: 'You are called Anna.',
+    wirEn: 'We are called Anna.',
+    ihrEn: 'You all are called Anna.',
+    sieEn: 'They are called Anna.',
+    past: 'hieß',
+    pastEn: 'He was called Tom.',
+    pastDe: 'Er ___ Tom.',
+    pastNeeds: 'an irregular past',
+    pastBuild: 'hieß',
+  },
+  machen: { past: 'machte', pastEn: 'He did it at noon.', pastDe: 'Er ___ es um zwölf.', weak: true },
+  lernen: { past: 'lernte', pastHe: 'learned', weak: true },
+  arbeiten: { past: 'arbeitete', pastHe: 'worked', weak: true, ete: true },
+  spielen: { past: 'spielte', pastHe: 'played', weak: true },
+  kaufen: { past: 'kaufte', pastHe: 'bought', weak: true },
+  kochen: { past: 'kochte', pastHe: 'cooked', weak: true },
+  fragen: { past: 'fragte', pastHe: 'asked', weak: true },
+  sagen: { past: 'sagte', pastHe: 'said', weak: true },
+  hören: { past: 'hörte', pastHe: 'listened', weak: true },
+  tanzen: { past: 'tanzte', pastHe: 'danced', weak: true },
+  frühstücken: { past: 'frühstückte', pastHe: 'had breakfast', weak: true },
+  öffnen: { past: 'öffnete', pastHe: 'opened', weak: true, ete: true },
+  antworten: { past: 'antwortete', pastHe: 'answered', weak: true, ete: true },
+  warten: { past: 'wartete', pastHe: 'waited', weak: true, ete: true },
+  wohnen: { past: 'wohnte', pastEn: 'He lived here.', pastDe: 'Er ___ hier.', weak: true },
+  suchen: { past: 'suchte', pastEn: 'He looked for the key.', pastDe: 'Er ___ den Schlüssel.', weak: true },
+  glauben: {
+    i: 'believe you',
+    duEn: 'You believe me.',
+    duDe: 'Du ___ mir.',
+    ihrEn: 'You all believe me.',
+    ihrDe: 'Ihr ___ mir.',
+    past: 'glaubte',
+    pastEn: 'He believed you.',
+    pastDe: 'Er ___ dir.',
+    weak: true,
+  },
+  aufstehen: { past: 'stand', pastHe: 'got up' },
+  anfangen: { du: 'fängst', past: 'fing', pastHe: 'started' },
+  einkaufen: { past: 'kaufte', pastHe: 'shopped', weak: true },
+  anrufen: { past: 'rief', pastHe: 'called' },
+  fernsehen: { du: 'siehst', past: 'sah', pastHe: 'watched TV' },
+  ausgehen: { past: 'ging', pastHe: 'went out' },
+  mitkommen: { past: 'kam', pastHe: 'came along' },
+  einladen: {
+    du: 'lädst',
+    duEn: 'You invite Anna at ten.',
+    duDe: 'Du ___ Anna um zehn ein.',
+    ihrEn: 'You all invite Anna at ten.',
+    ihrDe: 'Ihr ___ Anna um zehn ein.',
+    past: 'lud',
+    pastEn: 'He invited you at noon.',
+    pastDe: 'Er ___ dich um zwölf ein.',
+  },
+}
+
+function card(raw) {
+  const spec = { ...raw, ...(FORMS[raw.de] || {}) }
   const particle = spec.particle || ''
   const prefixNote = particle ? ', and the prefix stays at the end' : ''
   const aux = spec.aux || 'haben'
   const perfectDe = aux === 'sein' ? 'Ich bin ___.' : 'Ich habe ___.'
+  const bare = bareInfinitive(spec.de, particle)
+  const du = spec.du || regularDu(spec.ich)
+  const ihr = spec.ihr || regularIhr(spec.ich)
+  const wir = spec.wir || bare
+  const sie = spec.sie || wir
+  const duRegular = regularDu(spec.ich)
+  const ihrRegular = regularIhr(spec.ich)
+  const duEnding = extraE(stemOf(spec.ich)) ? '-est' : '-st'
+  const ihrEnding = extraE(stemOf(spec.ich)) ? '-et' : '-t'
+  const pastNeeds = spec.pastNeeds || (spec.weak ? (spec.ete ? 'stem + -ete' : 'stem + -te') : 'the simple past')
+  const pastBuild = spec.pastBuild || (spec.weak ? '' : spec.past)
+
+  function personNeeds(form, regular, ending, customNeeds) {
+    if (customNeeds) return customNeeds
+    if (form && form === regular) return ending
+    if (spec.erExtra) return ending
+    return 'an irregular form'
+  }
 
   return {
     id: spec.id || spec.de,
@@ -12,20 +264,67 @@ function card(spec) {
     en: spec.en,
     presentNote: spec.presentNote || '',
     scenes: [
-      {
-        id: 'ich',
-        label: 'Present',
-        slot: 'ich, present',
-        needs: spec.ichNeeds || `-e${prefixNote}`,
-        extra: spec.ichExtra || '',
-        build: spec.ichBuild || '',
-        why: particle
-          ? 'Present, ich. The prefix stays at the end of the sentence.'
-          : 'Present. The verb agrees with ich.',
-        en: spec.ichEn || `I ${spec.i} at ten.`,
-        de: spec.ichDe || (particle ? `Ich ___ um zehn ${particle}.` : 'Ich ___ um zehn.'),
-        answer: spec.ich,
-      },
+      presentLine(spec, particle, prefixNote, 'ich', 'Ich', 'um zehn', spec.ich, spec.ichNeeds || '-e', spec.ichExtra || '', spec.ichBuild || ''),
+      presentLine(
+        spec,
+        particle,
+        prefixNote,
+        'du',
+        'Du',
+        'um zehn',
+        du,
+        personNeeds(du, duRegular, duEnding, spec.duNeeds),
+        spec.duExtra || (spec.du && spec.erExtra ? spec.erExtra : ''),
+        spec.duBuild || '',
+      ),
+      presentLine(
+        spec,
+        particle,
+        prefixNote,
+        'er',
+        'Er',
+        'um zwölf',
+        spec.er,
+        spec.erNeeds || '-t',
+        spec.erExtra || '',
+        spec.erBuild || '',
+      ),
+      presentLine(
+        spec,
+        particle,
+        prefixNote,
+        'wir',
+        'Wir',
+        'um zehn',
+        wir,
+        spec.wirNeeds || (wir === bare ? '-en' : 'an irregular form'),
+        spec.wirExtra || '',
+        spec.wirBuild || '',
+      ),
+      presentLine(
+        spec,
+        particle,
+        prefixNote,
+        'ihr',
+        'Ihr',
+        'um zehn',
+        ihr,
+        personNeeds(ihr, ihrRegular, ihrEnding, spec.ihrNeeds),
+        spec.ihrExtra || '',
+        spec.ihrBuild || '',
+      ),
+      presentLine(
+        spec,
+        particle,
+        prefixNote,
+        'sie',
+        'Sie',
+        'um zehn',
+        sie,
+        spec.sieNeeds || (sie === wir ? (wir === bare ? '-en' : 'an irregular form') : 'an irregular form'),
+        spec.sieExtra || '',
+        spec.sieBuild || '',
+      ),
       {
         id: 'future',
         label: 'Future',
@@ -51,20 +350,6 @@ function card(spec) {
         answer: spec.de,
       },
       {
-        id: 'er',
-        label: 'Present',
-        slot: 'er, present',
-        needs: spec.erNeeds || `-t${prefixNote}`,
-        extra: spec.erExtra || '',
-        build: spec.erBuild || '',
-        why: particle
-          ? 'Present, er. The prefix stays at the end of the sentence.'
-          : 'Present. The verb agrees with er.',
-        en: spec.erEn || `He ${spec.he} at noon.`,
-        de: spec.erDe || (particle ? `Er ___ um zwölf ${particle}.` : 'Er ___ um zwölf.'),
-        answer: spec.er,
-      },
-      {
         id: 'perfect',
         label: 'Perfect',
         slot: 'the perfect',
@@ -75,6 +360,18 @@ function card(spec) {
         en: spec.perfEn || `I have ${spec.done}.`,
         de: spec.perfDe || perfectDe,
         answer: spec.part,
+      },
+      {
+        id: 'past',
+        label: 'Past',
+        slot: 'er, simple past',
+        needs: pastNeeds,
+        extra: spec.pastExtra || '',
+        build: pastBuild,
+        why: particle ? 'Simple past, er. The prefix stays at the end.' : 'Simple past. This is the er form.',
+        en: spec.pastEn || `He ${spec.pastHe} at ten.`,
+        de: spec.pastDe || (particle ? `Er ___ um zehn ${particle}.` : 'Er ___ um zehn.'),
+        answer: spec.past,
       },
     ],
   }
