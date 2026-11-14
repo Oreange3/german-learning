@@ -8,6 +8,7 @@ import LesenGame from './pages/LesenGame.jsx'
 import Login from './pages/Login.jsx'
 import Notes from './pages/Notes.jsx'
 import PronounGame from './pages/PronounGame.jsx'
+import SentenceGame from './pages/SentenceGame.jsx'
 import VerbGame from './pages/VerbGame.jsx'
 
 const loadOrange = () => import('./pages/OrangeCourse.jsx')
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/luecken" element={<ClozeGame />} />
         <Route path="/pronouns" element={<PronounGame />} />
         <Route path="/verbs" element={<VerbGame />} />
+        <Route path="/sentences" element={<SentenceGame />} />
         <Route path="/login" element={<Login />} />
         <Route path="/notes" element={<Notes />} />
         <Route path="/about" element={<About />} />
