@@ -115,7 +115,7 @@ function HintChart({ verb, scene }) {
         </thead>
         <tbody>
           {PRESENT_ENDINGS.map((row) => (
-            <tr key={row.id} className={scene?.id === row.id ? 'is-current' : undefined}>
+            <tr key={row.id} className={scene?.id === row.id || (scene?.id === 'sie' && row.id === 'wir') ? 'is-current' : undefined}>
               <td>{row.person}</td>
               <td lang="de">{row.ending}</td>
             </tr>
@@ -391,8 +391,8 @@ export default function VerbGame() {
     <section className="panel">
       <h2>Daily verb</h2>
       <p>
-        One verb for the whole set. It stays while the sentence changes: I eat at ten, I will eat, I want to eat, he
-        eats, I have eaten. Type the form that belongs in the gap.
+        One verb for the whole set. Every form that verb has comes up: ich, du, er, wir, ihr, sie, then I will, I want
+        to, the perfect, and the simple past. Type the form that belongs in the gap.
       </p>
       <div className="mode-row" role="group" aria-label="Play mode">
         <button
@@ -416,7 +416,7 @@ export default function VerbGame() {
       <p className="hint">
         {mode === 'daily'
           ? `Today (${todayLabel}): ${verb?.de || '—'} · ${Math.min(dailyDone, scenes.length)} / ${scenes.length} · ${dailyCorrect} correct. This verb stays until tomorrow.`
-          : `This round: ${verb?.de || '—'} · ${session.correct} correct out of ${session.seen}. The verb stays for all five forms.`}
+          : `This round: ${verb?.de || '—'} · ${session.correct} correct out of ${session.seen}. The verb stays for all ${scenes.length} forms.`}
       </p>
       {verb ? (
         <div className="mode-row" role="group" aria-label="Help">
