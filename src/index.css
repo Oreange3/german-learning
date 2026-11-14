@@ -1925,3 +1925,74 @@ h3 .muted {
   background: #f6e4cf;
   border: 1px solid #c56a16;
 }
+
+.translate-form {
+  max-width: 720px;
+}
+
+.translate-form label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+
+.translate-form textarea {
+  display: block;
+  width: 100%;
+  min-height: 74px;
+  margin-top: 4px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: #161410;
+  border: 1px solid #534c44;
+  font: 18px/1.45 Georgia, 'Times New Roman', serif;
+  resize: vertical;
+}
+
+.marked-result {
+  margin: 0 0 12px;
+  padding: 12px 14px 4px;
+  background: #161410;
+  border: 1px solid var(--line);
+}
+
+.marked-label {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.marked-line {
+  margin: 0 0 12px;
+  color: var(--ink);
+  background: transparent;
+  font: 20px/1.85 Georgia, 'Times New Roman', serif;
+  overflow-wrap: break-word;
+}
+
+.marked-note {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.mark-word {
+  display: inline;
+  padding: 0 0.18em;
+  border-radius: 2px;
+  font-weight: bold;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.mark-word.is-right {
+  color: #1c1915;
+  background: var(--gold);
+}
+
+.mark-word.is-wrong {
+  color: #ff3b30;
+  background: transparent;
+}
