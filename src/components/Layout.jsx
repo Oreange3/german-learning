@@ -17,6 +17,7 @@ export default function Layout() {
     { to: '/lesen', label: 'Lesen' },
     { to: '/luecken', label: 'Lücken' },
     { to: '/pronouns', label: 'Pronouns' },
+    { to: '/verbs', label: 'Verbs' },
   ]
   if (isAdmin) tabs.push({ to: '/course', label: 'Course' })
 
@@ -39,7 +40,7 @@ export default function Layout() {
             <div>
               <p className="brand-kicker">DAILY PRACTICE · THIS BROWSER</p>
               <h1 className="brand-title">{SITE_TITLE}</h1>
-              <p className="brand-tag">Gender, reading, gaps, and pronouns are open. The course is for the admin.</p>
+              <p className="brand-tag">Gender, reading, gaps, pronouns, and verbs are open. The course is for the admin.</p>
             </div>
           </div>
 
