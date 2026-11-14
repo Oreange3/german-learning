@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { getLesson, lessonNeighbors, lessonPlace } from '../data/courses.js'
 import { displayHeadword, getWordsByIds } from '../data/words.js'
+import ArticleChart from '../components/ArticleChart.jsx'
 import FillTable from '../components/FillTable.jsx'
 import DataTable from '../components/DataTable.jsx'
 
@@ -45,9 +46,13 @@ export default function Lesson() {
         <span className="level-pill">{lesson.level}</span>
       </p>
 
+      {lesson.category === 'cases' ? <ArticleChart /> : null}
+
       {lesson.points?.map((point) => (
         <p key={point}>{point}</p>
       ))}
+
+      {lesson.source ? <p className="hint">{lesson.source}</p> : null}
 
       {lesson.examples?.length > 0 && (
         <DataTable

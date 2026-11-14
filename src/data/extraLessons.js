@@ -263,7 +263,7 @@ export const extraLessons = {
     wordIds: ['weil', 'dass', 'arbeiten', 'lernen', 'heute'],
     points: [
       'Main clause: verb in position two. Ich bleibe zu Hause.',
-      'weil and dass open a Nebensatz. The conjugated verb goes last: Ich bleibe zu Hause, weil ich krank bin.',
+      'weil and dass open a Nebensatz. The conjugated verb goes last: Ich bleibe zu Hause, weil ich krank bin. The full set, including TeKaMoLo and the bracket, is in Sentence structure.',
       'dass reports a fact: Ich weiß, dass der Zug Verspätung hat. Comma before weil / dass.',
     ],
     examples: [

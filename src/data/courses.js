@@ -1,6 +1,7 @@
 import { caseCategory, caseLessons } from './cases.js'
 import { examPrograms } from './examPrep.js'
 import { extraLessons } from './extraLessons.js'
+import { sentenceCategory, sentenceLessons } from './sentence.js'
 
 export const courseTree = [
   {
@@ -159,6 +160,7 @@ export const courseTree = [
       },
     ],
   },
+  sentenceCategory,
   {
     id: 'b1',
     title: 'B1 · Threshold',
@@ -665,7 +667,7 @@ const coreLessons = {
   },
 }
 
-export const lessons = { ...coreLessons, ...caseLessons, ...extraLessons }
+export const lessons = { ...coreLessons, ...caseLessons, ...sentenceLessons, ...extraLessons }
 
 export function walkCourse() {
   const rows = []
