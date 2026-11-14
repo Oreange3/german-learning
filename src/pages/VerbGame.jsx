@@ -153,16 +153,21 @@ function GermanGap({ scene, revealed, right, guess, onGuess, inputRef }) {
   )
 }
 
-function VerbCard({ verb, scene, index, total, showEn, onAnswered, onNext, nextLabel }) {
+function VerbCard({ verb, scene, index, total, showEn, onAnswered, onNext, nextLabel, settled }) {
   const [guess, setGuess] = useState('')
-  const [revealed, setRevealed] = useState(false)
-  const [skipped, setSkipped] = useState(false)
-  const [right, setRight] = useState(false)
+  const [revealedNow, setRevealed] = useState(false)
+  const [skippedNow, setSkipped] = useState(false)
+  const [rightNow, setRight] = useState(false)
   const inputRef = useRef(null)
+  const revealed = Boolean(settled) || revealedNow
+  const skipped = settled ? Boolean(settled.skipped) : skippedNow
+  const right = settled ? Boolean(settled.correct) && !settled.skipped : rightNow
+  const typed = settled ? settled.typed || '' : guess
 
   useEffect(() => {
+    if (settled) return
     inputRef.current?.focus()
-  }, [])
+  }, [settled])
 
   function finish(result) {
     setRevealed(true)
@@ -174,12 +179,12 @@ function VerbCard({ verb, scene, index, total, showEn, onAnswered, onNext, nextL
   function check(event) {
     event.preventDefault()
     if (revealed) return
-    const typed = guess.trim()
-    if (!typed) return
-    const correct = answersMatch(typed, [scene.answer])
+    const written = guess.trim()
+    if (!written) return
+    const correct = answersMatch(written, [scene.answer])
     primeAudio()
     playResult(correct)
-    finish({ correct, typed, skipped: false })
+    finish({ correct, typed: written, skipped: false })
   }
 
   function markUnsure() {
@@ -205,7 +210,7 @@ function VerbCard({ verb, scene, index, total, showEn, onAnswered, onNext, nextL
           scene={scene}
           revealed={revealed}
           right={right && !skipped}
-          guess={guess}
+          guess={typed}
           onGuess={setGuess}
           inputRef={inputRef}
         />
@@ -221,7 +226,7 @@ function VerbCard({ verb, scene, index, total, showEn, onAnswered, onNext, nextL
               </>
             ) : (
               <>
-                Not quite. You wrote <strong lang="de">{guess.trim() || '—'}</strong>. The form is{' '}
+                Not quite. You wrote <strong lang="de">{typed.trim() || '—'}</strong>. The form is{' '}
                 <strong lang="de">{scene.answer}</strong>.
               </>
             )}{' '}
@@ -238,7 +243,7 @@ function VerbCard({ verb, scene, index, total, showEn, onAnswered, onNext, nextL
           </p>
         )}
       </form>
-      {revealed ? (
+      {revealed && onNext ? (
         <p>
           <button type="button" className="btn btn-gold" onClick={() => onNext(false)}>
             {nextLabel}
@@ -246,6 +251,20 @@ function VerbCard({ verb, scene, index, total, showEn, onAnswered, onNext, nextL
         </p>
       ) : null}
     </article>
+  )
+}
+
+function FormArrows({ canBack, canForward, onBack, onForward, children }) {
+  return (
+    <div className="slide-row">
+      <button type="button" className="slide-arrow" aria-label="Previous form" disabled={!canBack} onClick={onBack}>
+        ←
+      </button>
+      <div className="slide-body">{children}</div>
+      <button type="button" className="slide-arrow" aria-label="Next form" disabled={!canForward} onClick={onForward}>
+        →
+      </button>
+    </div>
   )
 }
 
@@ -305,6 +324,7 @@ export default function VerbGame() {
   const [practiceAnswers, setPracticeAnswers] = useState([])
   const [session, setSession] = useState({ seen: 0, correct: 0 })
   const [reviewOn, setReviewOn] = useState(false)
+  const [lookAt, setLookAt] = useState(null)
   const today = localDateKey()
   const [progress, setProgress] = useState(() => readDailyProgress(PROGRESS_KEY))
 
@@ -325,6 +345,28 @@ export default function VerbGame() {
   const formsAfterThis = scenes.filter((item) => !answeredIds.has(dailyKey(item)) && dailyKey(item) !== scene?.id).length
   const onLast = mode === 'daily' ? formsAfterThis === 0 : practiceIndex >= scenes.length - 1
   const todayLabel = new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+  const answerPool = mode === 'daily' ? progress.answers : practiceAnswers
+  const liveIndex = Math.max(0, scenes.findIndex((item) => item.id === scene?.id))
+  const reviewIndex = lookAt === null ? Math.max(0, scenes.length - 1) : Math.min(Math.max(lookAt, 0), Math.max(0, scenes.length - 1))
+
+  function answerAt(index) {
+    const item = scenes[index]
+    if (!verb || !item) return null
+    return answerPool.find((row) => row.id === `${verb.id}:${item.id}`) || null
+  }
+
+  function earlierThan(from) {
+    for (let index = from - 1; index >= 0; index -= 1) {
+      if (answerAt(index)) return index
+    }
+    return null
+  }
+
+  const browsing = !showReview && lookAt !== null && lookAt !== liveIndex && Boolean(answerAt(lookAt))
+  const viewedIndex = showReview ? reviewIndex : browsing ? lookAt : liveIndex
+  const viewedScene = scenes[viewedIndex] || scene
+  const canBack = showReview ? reviewIndex > 0 : earlierThan(browsing ? lookAt : liveIndex) !== null
+  const canForward = showReview ? reviewIndex < scenes.length - 1 : browsing || Boolean(answerAt(liveIndex))
 
   function closePops() {
     setHintOpen(false)
@@ -351,6 +393,7 @@ export default function VerbGame() {
   function onNext() {
     primeAudio()
     closePops()
+    setLookAt(null)
     if (mode === 'practice') {
       if (practiceIndex + 1 >= scenes.length) setReviewOn(true)
       else setPracticeIndex((value) => value + 1)
@@ -370,8 +413,59 @@ export default function VerbGame() {
     setSession({ seen: 0, correct: 0 })
     setReviewOn(false)
     setHoldId(null)
+    setLookAt(null)
     setMode('practice')
   }
+
+  function goBack() {
+    primeAudio()
+    closePops()
+    if (showReview) {
+      if (reviewIndex > 0) setLookAt(reviewIndex - 1)
+      return
+    }
+    const next = earlierThan(browsing ? lookAt : liveIndex)
+    if (next !== null) setLookAt(next)
+  }
+
+  function goForward() {
+    if (showReview) {
+      primeAudio()
+      closePops()
+      if (reviewIndex < scenes.length - 1) setLookAt(reviewIndex + 1)
+      return
+    }
+    if (browsing) {
+      primeAudio()
+      closePops()
+      let step = null
+      for (let index = lookAt + 1; index < liveIndex; index += 1) {
+        if (answerAt(index)) {
+          step = index
+          break
+        }
+      }
+      setLookAt(step)
+      return
+    }
+    if (answerAt(liveIndex)) onNext()
+  }
+
+  useEffect(() => {
+    function onKey(event) {
+      const tag = event.target?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || event.target?.isContentEditable) return
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        goBack()
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        goForward()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
 
   function openHint() {
     primeAudio()
@@ -405,6 +499,7 @@ export default function VerbGame() {
             setMode('daily')
             setHoldId(null)
             setReviewOn(false)
+            setLookAt(null)
           }}
         >
           Daily
@@ -438,6 +533,17 @@ export default function VerbGame() {
               ? `Today's verb is done. ${dailyCorrect} of ${scenes.length} were right. Tomorrow brings a different verb.`
               : `This round of ${verb.de} is done. ${session.correct} of ${session.seen} were right.`}
           </p>
+          <FormArrows canBack={canBack} canForward={canForward} onBack={goBack} onForward={goForward}>
+            <VerbCard
+              key={`review-${verb.id}-${scenes[reviewIndex]?.id || 'none'}`}
+              verb={verb}
+              scene={scenes[reviewIndex]}
+              index={reviewIndex}
+              total={scenes.length}
+              showEn={showEn}
+              settled={answerAt(reviewIndex) || { correct: false, typed: '', skipped: true }}
+            />
+          </FormArrows>
           <RoundSummary verb={verb} answers={summaryAnswers} showEn={showEn} />
           {mode === 'practice' ? (
             <p>
@@ -449,21 +555,36 @@ export default function VerbGame() {
         </>
       ) : null}
       {!showReview && verb && scene ? (
-        <VerbCard
-          key={`${mode}-${verb.id}-${scene.id}`}
-          verb={verb}
-          scene={scene}
-          index={Math.max(0, scenes.findIndex((item) => item.id === scene.id))}
-          total={scenes.length}
-          showEn={showEn}
-          onAnswered={onAnswered}
-          onNext={onNext}
-          nextLabel={onLast ? 'End' : 'Next form'}
-        />
+        <FormArrows canBack={canBack} canForward={canForward} onBack={goBack} onForward={goForward}>
+          {browsing ? (
+            <VerbCard
+              key={`back-${verb.id}-${scenes[lookAt].id}`}
+              verb={verb}
+              scene={scenes[lookAt]}
+              index={lookAt}
+              total={scenes.length}
+              showEn={showEn}
+              settled={answerAt(lookAt)}
+            />
+          ) : (
+            <VerbCard
+              key={`${mode}-${verb.id}-${scene.id}`}
+              verb={verb}
+              scene={scene}
+              index={liveIndex}
+              total={scenes.length}
+              showEn={showEn}
+              settled={answerAt(liveIndex)}
+              onAnswered={onAnswered}
+              onNext={onNext}
+              nextLabel={onLast ? 'End' : 'Next form'}
+            />
+          )}
+        </FormArrows>
       ) : null}
       {verb ? (
         <PopDialog open={hintOpen} onClose={() => setHintOpen(false)} title={`How to build ${verb.de}`} labelledBy="verb-hint-title">
-          <HintChart verb={verb} scene={showReview ? null : scene} />
+          <HintChart verb={verb} scene={viewedScene} />
         </PopDialog>
       ) : null}
       <PopDialog
